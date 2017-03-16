@@ -6,6 +6,7 @@
 typedef struct node {
 
     int data;
+    int pais; //depois explico
     struct node *next;
 
 } fotografia;
@@ -39,11 +40,11 @@ int main()  {
 
 	for(var = 0; var <= maxPhotos, var ++){
 
-        int photo1, photo2;
+        fotografia photo1, photo2;
 
 		scanf("%d %d", &photo1, &photo2);
 
-		new_Node(photo1, photo2);
-		actualizaLista();
+		//new_Node(photo1, photo2);
+		//actualizaLista();
 	}
 }
