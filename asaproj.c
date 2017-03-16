@@ -2,6 +2,13 @@
 #include <stdlib.h>
 
 
+typedef struct graph {
+
+	int V, E;
+	int **adj;
+	
+} *Graph;
+
 
 typedef struct node {
 
