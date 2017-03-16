@@ -13,7 +13,8 @@ typedef struct node {
 
 
 static struct node *head;
-static struct node *last;
+/*static struct node *last;*/
+
 
 
 /* Inicializa a lista */
@@ -21,18 +22,24 @@ static struct node *last;
 void init() {
 
     head = NULL;
-    last = NULL;
+    /*last = NULL;*/
+}
+
+
+int main()  {
 
     int var;
 
     int maxPhotos;
-
 	int maxPermuta;
-
 
 	scanf("%d %d", &maxPhotos, &maxPermuta);
 
+    fotografia NodeList[maxPhotos];
+
 	for(var = 0; var <= maxPhotos, var ++){
+
+        int photo1, photo2;
 
 		scanf("%d %d", &photo1, &photo2);
 
