@@ -22,4 +22,21 @@ void init() {
 
     head = NULL;
     last = NULL;
+
+    int var;
+
+    int maxPhotos;
+
+	int maxPermuta;
+
+
+	scanf("%d %d", &maxPhotos, &maxPermuta);
+
+	for(var = 0; var <= maxPhotos, var ++){
+
+		scanf("%d %d", &photo1, &photo2);
+
+		new_Node(photo1, photo2);
+		actualizaLista();
+	}
 }
