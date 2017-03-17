@@ -2,25 +2,37 @@
 #include <stdlib.h>
 
 
-/*typedef struct graph {
+/*ptr e um ponteiro para uma estrutura do tipo photograph */
 
-	int V, E;
-	int **adj;
-
-} *Graph;*/
-
-typedef struct node {
+typedef struct photograph {
 
     int data;
-    struct node *next;
+    struct photograph *next;
 
 } fotografia;
 
+typedef fotografia* pointer;
 
+/* Funcao VectorSearch() retorna 0 caso nao exista o valor na lista e retorna 1 caso contrario*/
+
+int VectorSearch(fotografia vectorPos, int valor)  {
+
+    pointer x = (pointer) malloc(sizeof(struct photograph));
+
+    x = vectorPos;
+
+    for(x; x != NULL; x = x->next) {
+
+        if(x->data == valor) {
+
+            return 1;
+        }
+    }
+
+    return 0;
+}
 
 int main()  {
-
-    /*int var;*/
 
     int maxPhotos;
 	int maxPermuta;
@@ -31,25 +43,35 @@ int main()  {
 
     fotografia NodeList[maxPhotos];
 
-    /* pointer e um ponteiro para a estrutura fotografia  */
+    pointer ptr = (pointer) malloc(sizeof(struct photograph));
 
-    fotografia *pointer;
-    pointer = (fotografia*) malloc(sizeof(fotografia));
-    int i;
 
     /* Ciclo que preenche o vector*/
-    
-    for(i = 0; i < maxPhotos; i++)  {
+    int i;
+
+    for(i = 0; i < maxPhotos; i++) {
 
         NodeList[i].data = i + 1;
+        NodeList[i].next = NULL;
     }
 
-	for(i= 0; i < maxPermuta; i ++){
+	for(i = 0; i < maxPermuta; i++) {
 
         fotografia photo1, photo2;
 
 		scanf("%d %d", &photo1.data, &photo2.data);
 
+        for(ptr = NodeList[0]; ptr != NULL; ptr ++) {
+
+            if(photo1.data == ptr->data) {
+
+                if(VectorSearch(ptr, photo2.data) == 0) {
+
+                    photo2.next = ptr->next;
+                    ptr->next = photo2;
+                }
+            }
+        }
 		/*printf("photo1: %d photo2: %d\n", photo1.data, photo2.data);*/
 	}
     return 0;
