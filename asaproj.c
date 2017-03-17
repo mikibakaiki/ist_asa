@@ -22,13 +22,14 @@ int VectorSearch(fotografia vectorPos, int valor)  {
     x = &vectorPos;
 
     for(x; x != NULL; x = x->next) {
-
+        printf("estou no for do VectorSearch\n");
+        printf("x->data = %d; valor = %d\n", x->data, valor);
         if(x->data == valor) {
-
+            printf("ja ha um elemento\n");
             return 1;
         }
     }
-
+    printf("nao ha elemento, vou inserir\n");
     return 0;
 }
 
@@ -60,15 +61,21 @@ int main()  {
         fotografia photo1, photo2;
 
 		scanf("%d %d", &photo1.data, &photo2.data);
+
         printf("photo1: %d photo2: %d\n", photo1.data, photo2.data);
 
+        int j;
+
         printf("antes do for \n");
-        for(ptr = &NodeList[0]; ptr != NULL; ptr ++) {
-            printf("passei o for");
 
-            if(photo1.data == ptr->data) {
+        for(j = 0; j < maxPhotos; j++) {
 
-                if(VectorSearch(*ptr, photo2.data) == 0) {
+            printf("passei o for\n");
+
+            if(photo1.data == NodeList[j].data) {
+                printf("photo1 = %d == Nodelist[j].data = %d\n", photo1.data,j);
+
+                if(VectorSearch(NodeList[j], photo2.data) == 0) {
 
                     photo2.next = ptr->next;
                     ptr->next = &photo2;
