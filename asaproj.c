@@ -2,56 +2,55 @@
 #include <stdlib.h>
 
 
-typedef struct graph {
+/*typedef struct graph {
 
 	int V, E;
 	int **adj;
-	
-} *Graph;
 
+} *Graph;*/
 
 typedef struct node {
 
     int data;
-    int pais; //depois explico
     struct node *next;
 
 } fotografia;
 
 
 
-static struct node *head;
-/*static struct node *last;*/
-
-
-
-/* Inicializa a lista */
-
-void init() {
-
-    head = NULL;
-    /*last = NULL;*/
-}
-
-
 int main()  {
 
-    int var;
+    /*int var;*/
 
     int maxPhotos;
 	int maxPermuta;
 
 	scanf("%d %d", &maxPhotos, &maxPermuta);
 
+    /*vector de nodos, onde se guardam as ligacoes*/
+
     fotografia NodeList[maxPhotos];
 
-	for(var = 0; var <= maxPhotos, var ++){
+    /* pointer e um ponteiro para a estrutura fotografia  */
+
+    fotografia *pointer;
+    pointer = (fotografia*) malloc(sizeof(fotografia));
+    int i;
+
+    /* Ciclo que preenche o vector*/
+    
+    for(i = 0; i < maxPhotos; i++)  {
+
+        NodeList[i].data = i + 1;
+    }
+
+	for(i= 0; i < maxPermuta; i ++){
 
         fotografia photo1, photo2;
 
-		scanf("%d %d", &photo1, &photo2);
+		scanf("%d %d", &photo1.data, &photo2.data);
 
-		//new_Node(photo1, photo2);
-		//actualizaLista();
+		/*printf("photo1: %d photo2: %d\n", photo1.data, photo2.data);*/
 	}
+    return 0;
 }
