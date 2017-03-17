@@ -19,7 +19,7 @@ int VectorSearch(fotografia vectorPos, int valor)  {
 
     pointer x = (pointer) malloc(sizeof(struct photograph));
 
-    x = vectorPos;
+    x = &vectorPos;
 
     for(x; x != NULL; x = x->next) {
 
@@ -60,19 +60,22 @@ int main()  {
         fotografia photo1, photo2;
 
 		scanf("%d %d", &photo1.data, &photo2.data);
+        printf("photo1: %d photo2: %d\n", photo1.data, photo2.data);
 
-        for(ptr = NodeList[0]; ptr != NULL; ptr ++) {
+        printf("antes do for \n");
+        for(ptr = &NodeList[0]; ptr != NULL; ptr ++) {
+            printf("passei o for");
 
             if(photo1.data == ptr->data) {
 
-                if(VectorSearch(ptr, photo2.data) == 0) {
+                if(VectorSearch(*ptr, photo2.data) == 0) {
 
                     photo2.next = ptr->next;
-                    ptr->next = photo2;
+                    ptr->next = &photo2;
                 }
             }
         }
-		/*printf("photo1: %d photo2: %d\n", photo1.data, photo2.data);*/
+
 	}
     return 0;
 }
