@@ -13,6 +13,32 @@ typedef struct photograph {
 
 typedef fotografia* pointer;
 
+
+pointer new(int maxphoto) {
+
+    pointer x = (pointer) malloc(sizeof(struct photograph));
+
+    x->data = maxphoto;
+    x->next = NULL;
+
+    return x;
+}
+
+void insert(pointer photo, pointer ptr) {
+
+    pointer x = (pointer) malloc(sizeof(struct photograph));
+    x = ptr;
+
+    while(x->next != NULL) {
+
+        x = x->next;
+    }
+
+    photo->next = x->next;
+    x->next = photo;
+}
+
+
 /* Funcao VectorSearch() retorna 0 caso nao exista o valor na lista e retorna 1 caso contrario*/
 
 int VectorSearch(fotografia vectorPos, int valor)  {
@@ -43,11 +69,9 @@ int main()  {
     /*vector de nodos, onde se guardam as ligacoes*/
 
     fotografia NodeList[maxPhotos];
+    // pointer ptr = (pointer) malloc(sizeof(struct photograph));
+    // ptr = *NodeList;
 
-    pointer ptr = (pointer) malloc(sizeof(struct photograph));
-
-
-    /* Ciclo que preenche o vector*/
     int i;
 
     for(i = 0; i < maxPhotos; i++) {
@@ -58,30 +82,30 @@ int main()  {
 
 	for(i = 0; i < maxPermuta; i++) {
 
-        fotografia photo1, photo2;
+        int photo1, photo2;
 
-		scanf("%d %d", &photo1.data, &photo2.data);
+		scanf("%d %d", &photo1, &photo2);
 
-        printf("photo1: %d photo2: %d\n", photo1.data, photo2.data);
 
-        int j;
+        insert( new(photo2), &NodeList[photo1]);
 
-        printf("antes do for \n");
 
-        for(j = 0; j < maxPhotos; j++) {
-
-            printf("passei o for\n");
-
-            if(photo1.data == NodeList[j].data) {
-                printf("photo1 = %d == Nodelist[j].data = %d\n", photo1.data,j);
-
-                if(VectorSearch(NodeList[j], photo2.data) == 0) {
-
-                    photo2.next = ptr->next;
-                    ptr->next = &photo2;
-                }
-            }
-        }
+        // printf("antes do for \n");
+        //
+        // for(j = 0; j < maxPhotos; j++) {
+        //
+        //     printf("passei o for\n");
+        //
+        //     if(photo1.data == NodeList[j].data) {
+        //         printf("photo1 = %d == Nodelist[j].data = %d\n", photo1.data,j);
+        //
+        //         if(VectorSearch(NodeList[j], photo2.data) == 0) {
+        //
+        //             photo2.next = ptr->next;
+        //             ptr->next = &photo2;
+        //         }
+        //     }
+        // }
 
 	}
     return 0;
