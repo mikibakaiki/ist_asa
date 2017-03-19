@@ -11,7 +11,7 @@ typedef struct photograph {
 
 } fotografia;
 
-typedef fotografia* pointer;
+typedef fotografia *pointer;
 
 
 pointer new(int maxphoto) {
@@ -24,40 +24,24 @@ pointer new(int maxphoto) {
     return x;
 }
 
-void insert(pointer photo, pointer ptr) {
+pointer insertEnd(pointer ptr, int value) {
 
-    pointer x = (pointer) malloc(sizeof(struct photograph));
-    x = ptr;
+    pointer x = ptr;
 
     while(x->next != NULL) {
 
         x = x->next;
     }
 
-    photo->next = x->next;
-    x->next = photo;
+    x->next = new(value);
+
+    return x;
 }
 
 
-/* Funcao VectorSearch() retorna 0 caso nao exista o valor na lista e retorna 1 caso contrario*/
 
-int VectorSearch(fotografia vectorPos, int valor)  {
 
-    pointer x = (pointer) malloc(sizeof(struct photograph));
 
-    x = &vectorPos;
-
-    for(x; x != NULL; x = x->next) {
-        printf("estou no for do VectorSearch\n");
-        printf("x->data = %d; valor = %d\n", x->data, valor);
-        if(x->data == valor) {
-            printf("ja ha um elemento\n");
-            return 1;
-        }
-    }
-    printf("nao ha elemento, vou inserir\n");
-    return 0;
-}
 
 int main()  {
 
@@ -69,8 +53,8 @@ int main()  {
     /*vector de nodos, onde se guardam as ligacoes*/
 
     fotografia NodeList[maxPhotos];
-    // pointer ptr = (pointer) malloc(sizeof(struct photograph));
-    // ptr = *NodeList;
+    pointer ptr = (pointer) malloc(sizeof(struct photograph));
+    ptr = NodeList;
 
     int i;
 
@@ -86,27 +70,14 @@ int main()  {
 
 		scanf("%d %d", &photo1, &photo2);
 
+        pointer x;
 
-        insert( new(photo2), &NodeList[photo1]);
+        x = insertEnd( (ptr + (photo1 - 1)), photo2);
 
-
-        // printf("antes do for \n");
-        //
-        // for(j = 0; j < maxPhotos; j++) {
-        //
-        //     printf("passei o for\n");
-        //
-        //     if(photo1.data == NodeList[j].data) {
-        //         printf("photo1 = %d == Nodelist[j].data = %d\n", photo1.data,j);
-        //
-        //         if(VectorSearch(NodeList[j], photo2.data) == 0) {
-        //
-        //             photo2.next = ptr->next;
-        //             ptr->next = &photo2;
-        //         }
-        //     }
-        // }
-
+        printf("ligacao do %d para o %d\n",(ptr+(photo1-1))->data, x->next->data);
 	}
+
+
+
     return 0;
 }
