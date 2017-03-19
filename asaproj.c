@@ -8,8 +8,6 @@ typedef struct photograph {
 
     int data;
     struct photograph *next;
-    int ligacao = 0; // Varia de 0 a maxPhotos
-    int visitado = 0; // Varia entre 0 e 1, marcacao de visitado ou nao (0  =  não visitado / 1 = visitado)
 
 } fotografia;
 
