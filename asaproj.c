@@ -8,8 +8,13 @@ typedef struct photograph {
 
     int data;
     struct photograph *next;
+    int ligacao = 0;
+
 
 } fotografia;
+
+
+
 
 typedef fotografia* pointer;
 
