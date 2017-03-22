@@ -10,77 +10,81 @@ typedef struct photograph {
     int inDeg;
     struct photograph *next;
 
-} fotografia;
+} *fotografia;
 
-typedef fotografia *pointer;
+/*typedef fotografia *pointer;*/
+/*static fotografia head;*/
 
+fotografia new(int value) {
 
+    fotografia x = (fotografia) malloc(sizeof(struct photograph));
 
-pointer new(int maxphoto) {
-
-    pointer x = (pointer) malloc(sizeof(struct photograph));
-
-    x->data = maxphoto;
+    x->data = value;
     x->inDeg = 0;
     x->next = NULL;
 
     return x;
 }
 
-pointer insertEnd(pointer ptr, int value) {
+fotografia insertBegin(fotografia head, int value) {
 
-    pointer x = ptr;
+    fotografia x = new(value);
 
-    while(x->next != NULL) {
-
-        x = x->next;
-    }
-
-    x->next = new(value);
-    /*sempre que se insere um elemento, significa que aumentou o inDegree*/
-    // x->inDeg++;
+    x->next = head;
 
     return x;
 }
 
+fotografia search(fotografia head, int value)  {
+
+    fotografia t;
+
+    for(t = head; t != NULL; t = t->next) {
+
+        if(t->data == value) {
+
+            return t;
+        }
+    }
+    return NULL;
+}
 
 int main()  {
 
     int maxPhotos;
-	int maxPermuta;
+    int maxPermuta;
+    int i;
+
+    fotografia head = (fotografia) malloc(sizeof(struct photograph));
+    head = NULL;
 
 	scanf("%d %d", &maxPhotos, &maxPermuta);
 
-    /*vector de nodos, onde se guardam as ligacoes*/
-
-    fotografia NodeList[maxPhotos];
-    pointer ptr = (pointer) malloc(sizeof(struct photograph));
-    ptr = NodeList;
-
-    int i;
-
     for(i = 0; i < maxPhotos; i++) {
+        /*printf("entrei no for\n");*/
 
-        NodeList[i].data = i + 1;
-        NodeList[i].inDeg = 0;
-        NodeList[i].next = NULL;
+        head = insertBegin(head, i+1);
+        printf("head = %d\n", head->data);
+
     }
 
 	for(i = 0; i < maxPermuta; i++) {
-
         int photo1, photo2;
+        fotografia t;
 
 		scanf("%d %d", &photo1, &photo2);
 
-        NodeList[photo2 - 1].inDeg++;
+        t = search(head, photo2);
 
-        pointer x;
+        if(t != NULL) {
 
-        x = insertEnd( (ptr + (photo1 - 1)), photo2);
+            t->inDeg ++;
+            printf("inDeg de %d = %d\n", photo2, t->inDeg);
+        }
 
 
-        printf("ligacao do %d para o %d\n",(ptr+(photo1-1))->data, x->next->data);
-        printf("indegree da posicao %d do vector = %d\n", (photo2-1), NodeList[photo2 - 1].inDeg);
+        // printf("ligacao do %d para o %d\n",(ptr+(photo1-1))->data, x->next->data);
+        // printf("indegree da posicao %d do vector = %d\n", (photo2-1), NodeList[photo2 - 1].inDeg);
 	}
 
     return 0;
