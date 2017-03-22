@@ -8,12 +8,13 @@ typedef struct photograph {
 
     int data;
     int inDeg;
+    int disc;
     struct photograph *next;
 
 } *fotografia;
 
 /*typedef fotografia *pointer;*/
-/*static fotografia head;*/
+static fotografia *head;
 
 fotografia new(int value) {
 
@@ -21,6 +22,7 @@ fotografia new(int value) {
 
     x->data = value;
     x->inDeg = 0;
+    x->disc = 0;
     x->next = NULL;
 
     return x;
@@ -49,43 +51,67 @@ fotografia search(fotografia head, int value)  {
     return NULL;
 }
 
+
+// void revTopOrdering(fotografia head, int maxPhotos, int maxPermuta) {
+//
+//     int i;
+//
+//     fotografia list, newlist;
+//
+//     for(list = head; list->next != NULL; list = list->next)  {
+//         if(list->disc == 0) {
+//             revTopOrder(list, newlist);
+//         }
+//     }
+//
+//     return newlist;
+// }
+//
+//
+// void revTopOrder(fotografia list, fotografia newlist) {
+//     list->disc = 1;
+//     for ()
+// }
+
 int main()  {
 
     int maxPhotos;
     int maxPermuta;
     int i;
 
-    fotografia head = (fotografia) malloc(sizeof(struct photograph));
-    head = NULL;
-
 	scanf("%d %d", &maxPhotos, &maxPermuta);
+
+    head = (fotografia*) malloc(maxPhotos*sizeof(fotografia));
+
+    for(i = 0; i < maxPhotos; i++) {
+        head[i] = NULL;
+    }
 
     for(i = 0; i < maxPhotos; i++) {
         /*printf("entrei no for\n");*/
 
-        head = insertBegin(head, i+1);
-        printf("head = %d\n", head->data);
-
+        head[i] = insertBegin(head[i], i+1);
+        printf("head = %d\n", head[i]->data);
     }
 
-	for(i = 0; i < maxPermuta; i++) {
-        int photo1, photo2;
-        fotografia t;
 
-		scanf("%d %d", &photo1, &photo2);
+	// for(i = 0; i < maxPermuta; i++) {
+    //     int photo1, photo2;
+    //
+    //     fotografia t;
+    //
+	// 	scanf("%d %d", &photo1, &photo2);
+    //
+    //     t = head[i] + photo2;
+    //
+    //     if(t != NULL) {
+    //
+    //         t->inDeg ++;
+    //         printf("inDeg de %d = %d\n", photo2, t->inDeg);
+    //     }
+	// }
 
-        t = search(head, photo2);
 
-        if(t != NULL) {
-
-            t->inDeg ++;
-            printf("inDeg de %d = %d\n", photo2, t->inDeg);
-        }
-
-
-        // printf("ligacao do %d para o %d\n",(ptr+(photo1-1))->data, x->next->data);
-        // printf("indegree da posicao %d do vector = %d\n", (photo2-1), NodeList[photo2 - 1].inDeg);
-	}
 
     return 0;
 }
