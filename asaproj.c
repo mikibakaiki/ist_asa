@@ -1,20 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BLACK 1 /*concluido*/
+#define WHITE -1 /* nao visitado*/
+#define GRAY 0 /*visitado*/
 
-/*ptr e um ponteiro para uma estrutura do tipo photograph */
 
 typedef struct photograph {
 
     int data;
     int inDeg;
-    int disc;
     struct photograph *next;
 
 } *fotografia;
 
-/*typedef fotografia *pointer;*/
 static fotografia *head;
+static fotografia final;
+int *pointer;
+
+
+
+/********************************************/
 
 fotografia new(int value) {
 
@@ -22,7 +28,6 @@ fotografia new(int value) {
 
     x->data = value;
     x->inDeg = 0;
-    x->disc = 0;
     x->next = NULL;
 
     return x;
@@ -47,13 +52,11 @@ fotografia insertEnd(fotografia head, int value) {
     }
 
     for(x = head; x->next != NULL; x = x->next);
-    printf("Vou inserir depois do x->data : %d\n", x->data);
+
     x->next = new(value);
-    printf("x->next->data = %d\n", x->next->data);
+
     return head;
 }
-
-
 
 fotografia search(fotografia head, int value)  {
 
@@ -74,31 +77,54 @@ void print(fotografia head) {
     fotografia t;
 
     for(t = head; t != NULL; t = t->next) {
+
         printf("elemento da lista : %d\n", t->data);
     }
+
+
 }
 
 
-// void revTopOrdering(fotografia head, int maxPhotos, int maxPermuta) {
-//
-//     int i;
-//
-//     fotografia list, newlist;
-//
-//     for(list = head; list->next != NULL; list = list->next)  {
-//         if(list->disc == 0) {
-//             revTopOrder(list, newlist);
-//         }
-//     }
-//
-//     return newlist;
-// }
-//
-//
-// void revTopOrder(fotografia list, fotografia newlist) {
-//     list->disc = 1;
-//     for ()
-// }
+void dfs(fotografia *head, int maxPhotos) {
+
+    int u;
+
+    for(u = 0; u < maxPhotos; u++) {
+
+        pointer[u] = WHITE;
+        printf("pointer [%d] == %d\n", u, pointer[u]);
+    }
+
+    for(u = 0; u < maxPhotos; u++) {
+
+        if(pointer[u] == WHITE) {
+
+            dfs_visit(head[u], u, maxPhotos);
+        }
+        // printf("u = %d\n", u);
+        // print(head[u]);
+    }
+}
+
+void dfs_visit(fotografia head, int u, int maxPhotos) {
+
+    int v;
+    pointer[u] = GRAY;
+
+    for(v = 0; v < maxPhotos; v++) {
+        if(head->next != NULL) {
+            if(pointer[v] == WHITE) {
+                dfs_visit(head, v, maxPhotos);
+            }
+        }
+    }
+    pointer[u] = BLACK;
+    final = insertBegin(final, head[u].data);
+}
+
+
+
+
 
 int main()  {
 
@@ -108,36 +134,33 @@ int main()  {
 
 	scanf("%d %d", &maxPhotos, &maxPermuta);
 
+    int color[maxPhotos];
+
+    pointer = color;
+
     head = (fotografia*) malloc(maxPhotos*sizeof(fotografia));
 
     for(i = 0; i < maxPhotos; i++) {
         head[i] = NULL;
     }
 
-    for(i = 0; i < maxPhotos; i++) {
-        /*printf("entrei no for\n");*/
-        head[i] = insertBegin(head[i], i+1);
-        printf("head = %d\n", head[i]->data);
-    }
-
+    // for(i = 0; i < maxPhotos; i++) {
+    //
+    //     head[i] = insertBegin(head[i], i+1);
+    // }
 
 	for(i = 0; i < maxPermuta; i++) {
 
         int photo1, photo2;
 
-        // fotografia t;
 		scanf("%d %d", &photo1, &photo2);
 
         head[photo1-1] = insertEnd(head[photo1-1], photo2);
-        /*printf("photo1 : %d; photo2 : %d\n", photo1, photo2);*/
-        /*printf("elementos do head[%d]: %d\n", photo1-1, photo2);*/
-
 	}
-    print(head[0]);
-    printf("proxima lista\n");
-    print(head[1]);
 
+    dfs(head, maxPhotos);
 
+    // print(final);
 
     return 0;
 }
