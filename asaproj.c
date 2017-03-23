@@ -82,8 +82,9 @@ void print(fotografia head) {
 
     for(t = head; t != NULL; t = t->next) {
 
-        printf("elemento da lista : %d\n", t->data);
+        printf("%d ", t->data);
     }
+    printf("\n");
 
 
 }
@@ -106,7 +107,7 @@ void dfs_visit(int u, int maxPhotos) {
         }
     }
     pointer[u] = BLACK;
-    printf("pointer[%d] = %d\n", u, pointer[u]);
+    /*printf("pointer[%d] = %d\n", u, pointer[u]);*/
     final = insertBegin(final, u + 1);
 }
 
@@ -128,18 +129,18 @@ void dfs(int maxPhotos) {
 
             dfs_visit(u, maxPhotos);
         }
-        // printf("u = %d\n", u);
-        // print(head[u]);
+        /*printf("u = %d\n", u);*/
+        /*print(head[u]);*/
     }
 }
 
 void insuf() {
-    printf("cheguei ao insuf\n");
+    /*printf("cheguei ao insuf\n");*/
     fotografia iter = final;
 
     while (iter->next != NULL) {
-        printf("procurar no head[%d] o elemento %d\n", iter->data,(iter->next)->data);
-        if(search(head[iter->data - 1],iter->next->data) == 1) {
+        /*printf("procurar no head[%d] o elemento %d\n", iter->data,(iter->next)->data);*/
+        if(search(head[iter->data - 1],iter->next->data) == 0) {
 
             insuficiente = 1;
         }
@@ -191,7 +192,7 @@ int main()  {
 
     if(insuficiente == 1) {
 
-        printf("insuficiente\n");
+        printf("Insuficiente\n");
 
         return 0;
     }
