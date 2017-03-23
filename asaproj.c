@@ -17,6 +17,8 @@ typedef struct photograph {
 static fotografia *head;
 static fotografia final;
 int *pointer;
+int incoerente = 0;
+int insuficiente = 0;
 
 
 
@@ -84,43 +86,53 @@ void print(fotografia head) {
 
 }
 
+void dfs_visit(int u, int maxPhotos) {
 
-void dfs(fotografia *head, int maxPhotos) {
+    fotografia v;
+    pointer[u] = GRAY;
+
+    for(v = head[u]; v != NULL; v = v->next) {
+        /*printf("dfs_visit for\n");*/
+        if(v->next != NULL) {
+            /*printf("dfs_visit next != NULL\n");*/
+            if(pointer[v->data - 1] == WHITE) {
+                /*printf("dfs_visit pointer[v->data] == WHITE\n");*/
+                dfs_visit((v->data - 1), maxPhotos);
+            }
+            else if(pointer[v->data - 1] == GRAY) {
+                incoerente = 1;
+                return;
+            }
+        }
+    }
+    pointer[u] = BLACK;
+    printf("pointer[%d] = %d\n", u, pointer[u]);
+    final = insertBegin(final, u);
+}
+
+
+void dfs(int maxPhotos) {
 
     int u;
 
     for(u = 0; u < maxPhotos; u++) {
 
         pointer[u] = WHITE;
-        printf("pointer [%d] == %d\n", u, pointer[u]);
+        /*printf("pointer [%d] == %d\n", u, pointer[u]);*/
     }
 
     for(u = 0; u < maxPhotos; u++) {
-
+        /*printf("entrei no for\n");*/
         if(pointer[u] == WHITE) {
+            /*printf("pointer[%d] = WHITE\n", u);*/
 
-            dfs_visit(head[u], u, maxPhotos);
+            dfs_visit(u, maxPhotos);
         }
         // printf("u = %d\n", u);
         // print(head[u]);
     }
 }
 
-void dfs_visit(fotografia head, int u, int maxPhotos) {
-
-    int v;
-    pointer[u] = GRAY;
-
-    for(v = 0; v < maxPhotos; v++) {
-        if(head->next != NULL) {
-            if(pointer[v] == WHITE) {
-                dfs_visit(head, v, maxPhotos);
-            }
-        }
-    }
-    pointer[u] = BLACK;
-    final = insertBegin(final, head[u].data);
-}
 
 
 
@@ -144,10 +156,6 @@ int main()  {
         head[i] = NULL;
     }
 
-    // for(i = 0; i < maxPhotos; i++) {
-    //
-    //     head[i] = insertBegin(head[i], i+1);
-    // }
 
 	for(i = 0; i < maxPermuta; i++) {
 
@@ -158,9 +166,22 @@ int main()  {
         head[photo1-1] = insertEnd(head[photo1-1], photo2);
 	}
 
-    dfs(head, maxPhotos);
+    dfs(maxPhotos);
 
-    // print(final);
+    if(incoerente == 1) {
+
+        printf("Incoerente\n");
+
+        return 0;
+    }
+    if(insuficiente == 1) {
+
+        printf("insuficiente\n");
+
+        return 0;
+    }
+
+    print(final);
 
     return 0;
 }
