@@ -76,17 +76,19 @@ int search(fotografia head, int value)  {
     return 0;
 }
 
-void print(fotografia head) {
+void print(fotografia head, int maxPhotos) {
 
     fotografia t;
-
+    int i = 0;
     for(t = head; t != NULL; t = t->next) {
-
-        printf("%d ", t->data);
+        i++;
+        if(i < maxPhotos) {
+            printf("%d ", t->data);
+        }
+        else {
+            printf("%d\n", t->data);
+        }
     }
-    printf("\n");
-
-
 }
 
 void dfs_visit(int u, int maxPhotos) {
@@ -197,7 +199,7 @@ int main()  {
         return 0;
     }
 
-    print(final);
+    print(final, maxPhotos);
 
     return 0;
 }
