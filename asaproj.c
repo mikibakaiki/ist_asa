@@ -15,7 +15,9 @@ typedef struct photograph {
 } *fotografia;
 
 static fotografia *head;
+
 static fotografia final;
+
 int *pointer;
 int incoerente = 0;
 int insuficiente = 0;
@@ -49,7 +51,7 @@ fotografia insertEnd(fotografia head, int value) {
     fotografia x;
 
     if(head == NULL) {
-        printf("head e null\n");
+        /*printf("head e null\n");*/
         return new(value);
     }
 
@@ -60,7 +62,7 @@ fotografia insertEnd(fotografia head, int value) {
     return head;
 }
 
-fotografia search(fotografia head, int value)  {
+int search(fotografia head, int value)  {
 
     fotografia t;
 
@@ -68,10 +70,10 @@ fotografia search(fotografia head, int value)  {
 
         if(t->data == value) {
 
-            return t;
+            return 1;
         }
     }
-    return NULL;
+    return 0;
 }
 
 void print(fotografia head) {
@@ -93,21 +95,19 @@ void dfs_visit(int u, int maxPhotos) {
 
     for(v = head[u]; v != NULL; v = v->next) {
         /*printf("dfs_visit for\n");*/
-        if(v->next != NULL) {
-            /*printf("dfs_visit next != NULL\n");*/
-            if(pointer[v->data - 1] == WHITE) {
-                /*printf("dfs_visit pointer[v->data] == WHITE\n");*/
-                dfs_visit((v->data - 1), maxPhotos);
-            }
-            else if(pointer[v->data - 1] == GRAY) {
-                incoerente = 1;
-                return;
-            }
+        /*printf("dfs_visit next != NULL\n");*/
+        if(pointer[v->data - 1] == WHITE) {
+            /*printf("dfs_visit pointer[v->data] == WHITE\n");*/
+            dfs_visit((v->data - 1), maxPhotos);
+        }
+        else if(pointer[v->data - 1] == GRAY) {
+            incoerente = 1;
+            return;
         }
     }
     pointer[u] = BLACK;
     printf("pointer[%d] = %d\n", u, pointer[u]);
-    final = insertBegin(final, u);
+    final = insertBegin(final, u + 1);
 }
 
 
@@ -133,6 +133,19 @@ void dfs(int maxPhotos) {
     }
 }
 
+void insuf() {
+    printf("cheguei ao insuf\n");
+    fotografia iter = final;
+
+    while (iter->next != NULL) {
+        printf("procurar no head[%d] o elemento %d\n", iter->data,(iter->next)->data);
+        if(search(head[iter->data - 1],iter->next->data) == 1) {
+
+            insuficiente = 1;
+        }
+        iter = iter->next;
+    }
+}
 
 
 
@@ -167,6 +180,7 @@ int main()  {
 	}
 
     dfs(maxPhotos);
+    insuf();
 
     if(incoerente == 1) {
 
@@ -174,6 +188,7 @@ int main()  {
 
         return 0;
     }
+
     if(insuficiente == 1) {
 
         printf("insuficiente\n");
