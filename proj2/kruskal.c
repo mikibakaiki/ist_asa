@@ -1,90 +1,131 @@
-/******************************************/
-/*			2 Projecto ASA	              */
-/*										  */
-/*		 Daniela Rodrigues - 84919        */
-/*      Joao Miguel Campos - 75785	      */
-/*										  */
-/******************************************/
+/****************************************************************************/
+/*                                                                          */
+/*							  2 Projecto ASA								*/
+/*																			*/
+/*						Joao Miguel Campos, 75785							*/
+/*						 Daniela Rodrigues, 84919							*/
+/*																			*/
+/*						   2016/2017 - 2 Semestre							*/
+/*																			*/
+/****************************************************************************/
+
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PRETO 1
-#define BRANCO 0
 
-
-
-typedef struct city{
+typedef struct edge{
 
 	int id;
-	int cor;
 	int custo;
 	int parent;
 
-} cidade;
+} Edge;
 
 
-cidade *head;
-cidade *mst;
+typedef struct set{
+	int parent;
+	int rank;
+} Subset;
+
+
+Edge *ptrEdges;
+Subset *subsets;
 int numEdges;
-cidade lista;
-int custo_total, num_estradas, num_aero;
-int cont = 0;
 int maxCidade;
+int maxAeroporto;
 
-int kruskal(head, int size, int order, cidade *(*mst)) {
+void makeSubSet(int v) {
+	subsets[v].parent = v;
+	subsets[v].rank = 0;
+}
 
-	*mst = malloc(sizeof(struct city) * (order - 1));
+/*Edge new(int i, int id, int custo, int parent) {
 
-	int *vertices = malloc(sizeof(int) * order);
+	ptrEdges[i].id = id;
+	ptrEdges[i].custo = custo;
+	ptrEdges[i].parent = parent;
+
+	return ptrEdges[i];
+}*/
+
+int qcmp(const void *p, const void *q)  {
+	/* O qcmp passa ponteiros para as posicoes e nao os valores
+	* Assim, temos que por o ponteiro a apontar para cidade e depois, desreferenciamo-lo*/
+
+	Edge x = *((Edge const *) p);
+
+	Edge y = *((Edge const *) q);
+
+	if( x.custo == y.custo) {
+		if(x.parent != maxCidade+1)
+			return 1;
+		else
+			return -2;
+
+	}
+	return (x.custo - y.custo);
+}
+
+
+int main() {
 
 	int i;
 
-	int cost;
+	scanf("%d", &maxCidade);
+	scanf("%d", &maxAeroporto);
 
-	if(*mst == NULL || vertices = NULL) {
-		free(*mst);
-		free(vertices);
-		return 0;
+	numEdges = maxCidade + maxAeroporto;
+	/****************   CRIACAO DO GRAFO   ****************/
+
+	ptrEdges = (Edge *) malloc(sizeof(Edge));
+	subsets = (Subset *) malloc(sizeof(Subset));
+
+	Edge edges[numEdges];
+	ptrEdges = edges;
+
+	/* a posicao i = maxCidade sera o vertice extra, sky, que e comum a todas as cidades que tiverem aeroporto */
+
+	int aeroporto_id, custo_aero;
+
+	for(i = 0; i < maxAeroporto; i++){
+		scanf("%d %d", &aeroporto_id, &custo_aero);
+
+		edges[i].id = aeroporto_id;
+		ptrEdges[i].custo = custo_aero;
+		ptrEdges[i].parent = maxCidade + 1;
+
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
 	}
 
-	for(i = 0; i < order; i++) {
-		vertices[i] = i;
+	int maxEstradas, cidadeA, cidadeB, custoEstradaAB;
+
+	scanf("%d", &maxEstradas);
+
+	/*printf(" maxEstradas %d\n", maxEstradas);*/
+
+	for(i = maxAeroporto; i < (maxAeroporto + maxEstradas); i++) {
+		scanf("%d %d %d", &cidadeA, &cidadeB, &custoEstradaAB);
+
+		ptrEdges[i].id = cidadeB;
+		ptrEdges[i].custo = custoEstradaAB;
+		ptrEdges[i].parent = cidadeA;
+
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
 	}
 
-	/**** SORT   ****/
+	/****************   COLOCAR TUDO NUM VECTOR ORDENADO   ****************/
 
-	for(i = 0; i < order - 1; i++) {
-		int j;
-		int cheapest = -1;
 
-		for(j = 0; j < size && cheapest = -1; j++) {
-			if(vertices[edge[j].first] != vertices[edges[j].second]) {
-				cheapest = j;
-			}
-		}
 
-		if(cheapest == -1) {
-			free(*mst);
-			*mst = NULL;
-			free(vertices);
-			return 0;
-		}
+	qsort(ptrEdges, numEdges, sizeof(Edge), qcmp);
 
-		(*mst)[i] = edges[cheapest];
+	printf("\n ---  VECTOR ORDENADO POR PESOS   ---\n\n");
 
-		for(j = 0; j < order; j++ ) {
-			if(vertices[j] == edges[cheapest].second) {
-				vertices[j] = edges[cheapest].first;
-			}
-		}
-
-		cost += edges[cheapest].weight;
+	for(i = 0; i < numEdges; i++) {
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
 
 	}
 
-	free(vertices);
-
-	return cost;
-
+	return 0;
 }
