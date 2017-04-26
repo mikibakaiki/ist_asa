@@ -7,7 +7,7 @@
 *.o
 *.so
 a.out
-asaproj2
+proj2
 tester/
 
 # Packages #
