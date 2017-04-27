@@ -1,10 +1,10 @@
-all: proj2
+all: kruskal
 
-proj2: proj2.o
-	gcc -g -Wall -pedantic -o proj2 proj2.o
+kruskal: kruskal.o
+	gcc -g -Wall -pedantic -o kruskal kruskal.o
 
-proj2.o: proj2.c
-	gcc -g -Wall -pedantic -c proj2.c
+kruskal.o: kruskal.c
+	gcc -g -Wall -pedantic -c kruskal.c
 
 clean:
-	rm -f *.o proj2
+	rm -f *.o kruskal

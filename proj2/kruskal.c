@@ -56,13 +56,21 @@ int qcmp(const void *p, const void *q)  {
 
 	Edge y = *((Edge const *) q);
 
-	if( x.custo == y.custo) {
-		if(x.parent != maxCidade+1)
-		return -1;
-		else
-		return 1;
+	// if(x.custo < 0 ) {
+	// 	return -1;
+	// }
 
+
+	if( x.custo == y.custo) {
+		if(x.parent != maxCidade+1) {
+			return -1;
+		}
+
+		else {
+			return 1;
+		}
 	}
+
 	return (x.custo - y.custo);
 }
 
@@ -109,22 +117,27 @@ void kruskal() {
 		makeSubSet(i+1);
 	}
 
-	for(i = 0; i < maxCidade + 1; i++) {
+	for(i = 0; i < numEdges; i++) {
 
 		int src = findSet(ptrEdges[i].parent);
 		int dest = findSet(ptrEdges[i].id);
 
 		if(src != dest) {
-			ptrResultado[cont].id = ptrEdges[i].id;
-			printf("\nptrResultado[%d].id = %d\n", cont, ptrEdges[i].id);
-
 			ptrResultado[cont].parent = ptrEdges[i].parent;
-			printf("ptrResultado[%d].parent = %d\n", cont, ptrEdges[i].parent);
+			printf("\nptrResultado[%d].parent = %d\n", cont, ptrEdges[i].parent);
+
+			ptrResultado[cont].id = ptrEdges[i].id;
+			printf("ptrResultado[%d].id = %d\n", cont, ptrEdges[i].id);
 
 			ptrResultado[cont].custo = ptrEdges[i].custo;
 			printf("ptrResultado[%d].custo = %d\n", cont, ptrEdges[i].custo);
+
 			cont++;
 			linkSet(src, dest);
+
+			if(cont == maxCidade) {
+				break;
+			}
 		}
 	}
 }
@@ -136,7 +149,7 @@ int main() {
 	scanf("%d", &maxCidade);
 	scanf("%d", &maxAeroporto);
 
-	numEdges = maxCidade + maxAeroporto;
+
 
 
 	/****************   CRIACAO DO GRAFO   ****************/
@@ -154,12 +167,29 @@ int main() {
 	Edge resultado[maxCidade];
 	ptrResultado = resultado;
 
+	for(i = 0; i < numEdges; i++) {
+		ptrEdges[i].parent = -1;
+		ptrEdges[i].id = -1;
+		ptrEdges[i].custo = -1;
+	}
+
+	for(i = 0; i < maxCidade; i++) {
+		ptrResultado[i].parent = -1;
+		ptrResultado[i].id = -1;
+		ptrResultado[i].custo = 0;
+	}
+
 	/* a posicao i = maxCidade sera o vertice extra, sky, que e comum a todas as cidades que tiverem aeroporto */
 
 	int aeroporto_id, custo_aero;
+	int max_cost = 0;
 
 	for(i = 0; i < maxAeroporto; i++){
 		scanf("%d %d", &aeroporto_id, &custo_aero);
+
+		if(custo_aero > max_cost) {
+			max_cost = custo_aero;
+		}
 
 		edges[i].id = aeroporto_id;
 		ptrEdges[i].custo = custo_aero;
@@ -172,10 +202,16 @@ int main() {
 
 	scanf("%d", &maxEstradas);
 
+	numEdges = maxAeroporto + maxEstradas;
+
 	/*printf(" maxEstradas %d\n", maxEstradas);*/
 
 	for(i = maxAeroporto; i < (maxAeroporto + maxEstradas); i++) {
 		scanf("%d %d %d", &cidadeA, &cidadeB, &custoEstradaAB);
+
+		if(custoEstradaAB > max_cost) {
+			max_cost = custoEstradaAB;
+		}
 
 		ptrEdges[i].id = cidadeB;
 		ptrEdges[i].custo = custoEstradaAB;
@@ -186,7 +222,12 @@ int main() {
 
 	/****************   COLOCAR TUDO NUM VECTOR ORDENADO   ****************/
 
+	for(i = 0; i < numEdges; i++) {
+		if(ptrEdges[i].parent == -1 && ptrEdges[i].id ==-1) {
 
+			ptrEdges[i].custo = max_cost+1;
+		}
+	}
 
 	qsort(ptrEdges, numEdges, sizeof(Edge), qcmp);
 
@@ -203,6 +244,7 @@ int main() {
 	int num_roads = 0;
 
 	printf("\n\n------   VERTICES / EDGES ESCOLHIDOS   ------\n\n");
+
 	for(i = 0; i < maxCidade; i++) {
 
 		printf("[ parent = %d ; id = %d ; custo = %d ]\n", ptrResultado[i].parent, ptrResultado[i].id, ptrResultado[i].custo);
