@@ -19,25 +19,31 @@
 
 typedef struct edge{
 
-	int id;
-	int custo;
-	int parent;
+	long long int id;
+	long long int custo;
+	long long int parent;
 
 } Edge;
 
 
 typedef struct set{
-	int parent;
-	int rank;
+	long long int parent;
+	long long int rank;
 } Subset;
 
 
 Edge *ptrEdges;
 Subset *ptrSubsets;
+Edge *ptrEdgesSemAero;
 Edge *ptrResultado;
-int numEdges;
-int maxCidade;
-int maxAeroporto;
+
+long long int numEdges;
+long long int maxCidade;
+long long int maxAeroporto;
+
+long long int custo_total;
+long long int num_aero;
+long long int num_roads;
 
 
 void makeSubSet(int v) {
@@ -56,11 +62,6 @@ int qcmp(const void *p, const void *q)  {
 
 	Edge y = *((Edge const *) q);
 
-	// if(x.custo < 0 ) {
-	// 	return -1;
-	// }
-
-
 	if( x.custo == y.custo) {
 		if(x.parent != maxCidade+1) {
 			return -1;
@@ -72,6 +73,29 @@ int qcmp(const void *p, const void *q)  {
 	}
 
 	return (x.custo - y.custo);
+}
+
+
+int cmpWithoutAer(const void *p, const void *q) {
+
+	Edge x = *((Edge const *) p);
+
+	Edge y = *((Edge const *) q);
+
+	// if(x.parent <= y.parent) {
+	//
+	// 	if(x.custo <= y.custo) {
+	// 		return -1;
+	// 	}
+	//
+	// 	else
+	// }
+	//
+	// else{
+	// 	return 1;
+	// }
+
+	return (x.parent < y.parent) - (x.custo < y.custo);
 }
 
 int findSet(int i) {
@@ -123,15 +147,16 @@ void kruskal() {
 		int dest = findSet(ptrEdges[i].id);
 
 		if(src != dest) {
-			ptrResultado[cont].parent = ptrEdges[i].parent;
-			printf("\nptrResultado[%d].parent = %d\n", cont, ptrEdges[i].parent);
 
-			ptrResultado[cont].id = ptrEdges[i].id;
-			printf("ptrResultado[%d].id = %d\n", cont, ptrEdges[i].id);
+			custo_total += ptrEdges[i].custo;
 
-			ptrResultado[cont].custo = ptrEdges[i].custo;
-			printf("ptrResultado[%d].custo = %d\n", cont, ptrEdges[i].custo);
+			if(ptrEdges[cont].parent == maxCidade + 1) {
+				num_aero++;
+			}
 
+			else {
+				num_roads++;
+			}
 			cont++;
 			linkSet(src, dest);
 
@@ -157,8 +182,10 @@ int main() {
 	ptrEdges = (Edge *) malloc(sizeof(Edge) * numEdges);
 	ptrSubsets = (Subset *) malloc(sizeof(Subset) * maxCidade + 1);
 	ptrResultado = (Edge *) malloc(sizeof(Edge) * maxCidade);
+	ptrEdgesSemAero = (Edge *) malloc(sizeof(Edge) * numEdges);
 
 	Edge edges[numEdges];
+	printf("\n\n\n --- NUM EDGES = %d\n\n\n", numEdges);
 	ptrEdges = edges;
 
 	Subset conjuntos[maxCidade + 1];
@@ -238,34 +265,26 @@ int main() {
 
 	}
 
+	custo_total = 0;
+	num_aero = 0;
+	num_roads = 0;
+
 	kruskal();
-	int custo_total = 0;
-	int num_aero = 0;
-	int num_roads = 0;
 
-	printf("\n\n------   VERTICES / EDGES ESCOLHIDOS   ------\n\n");
+	ptrEdgesSemAero = ptrEdges;
 
-	for(i = 0; i < maxCidade; i++) {
+	qsort(ptrEdgesSemAero, numEdges, sizeof(Edge), cmpWithoutAer);
 
-		printf("[ parent = %d ; id = %d ; custo = %d ]\n", ptrResultado[i].parent, ptrResultado[i].id, ptrResultado[i].custo);
+	printf("\n ---  VECTOR ORDENADO POR PESOS SEM AERO   ---\n\n");
 
-		custo_total += ptrResultado[i].custo;
+	for(i = 0; i < numEdges; i++) {
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
 
-		if(ptrResultado[i].parent == maxCidade + 1) {
-
-			num_aero++;
-
-		}
-
-		else {
-
-			num_roads++;
-		}
 	}
 
+
+
 	printf("%d\n%d %d\n", custo_total, num_aero, num_roads);
-
-
 
 	return 0;
 }
