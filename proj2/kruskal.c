@@ -19,31 +19,31 @@
 
 typedef struct edge{
 
-	long long int id;
-	long long int custo;
-	long long int parent;
+	int id;
+	int custo;
+	int parent;
 
 } Edge;
 
 
 typedef struct set{
-	long long int parent;
-	long long int rank;
+	int parent;
+	int rank;
 } Subset;
 
 
 Edge *ptrEdges;
 Subset *ptrSubsets;
 Edge *ptrEdgesSemAero;
-Edge *ptrResultado;
+Edge *ptrEdgesAero;
 
-long long int numEdges;
-long long int maxCidade;
-long long int maxAeroporto;
+int numEdges;
+int maxCidade;
+int maxAeroporto;
 
-long long int custo_total;
-long long int num_aero;
-long long int num_roads;
+int custo_total;
+int num_aero;
+int num_roads;
 
 
 void makeSubSet(int v) {
@@ -167,6 +167,8 @@ void kruskal() {
 	}
 }
 
+
+
 int main() {
 
 	int i;
@@ -175,86 +177,103 @@ int main() {
 	scanf("%d", &maxAeroporto);
 
 
-
-
 	/****************   CRIACAO DO GRAFO   ****************/
 
-	ptrEdges = (Edge *) malloc(sizeof(Edge) * numEdges);
-	ptrSubsets = (Subset *) malloc(sizeof(Subset) * maxCidade + 1);
-	ptrResultado = (Edge *) malloc(sizeof(Edge) * maxCidade);
-	ptrEdgesSemAero = (Edge *) malloc(sizeof(Edge) * numEdges);
+	/*criacao de um vector que vai guardar as informacoes das edges que sao de aeroportos */
+	ptrEdgesAero = (Edge *) malloc(sizeof(Edge) * maxAeroporto);
 
-	Edge edges[numEdges];
-	printf("\n\n\n --- NUM EDGES = %d\n\n\n", numEdges);
-	ptrEdges = edges;
+	Edge edges[maxAeroporto];
+	ptrEdgesAero = edges;
+
+
+	/*criacao de um vector que vai guardar o estado de cada subset */
+	ptrSubsets = (Subset *) malloc(sizeof(Subset) * maxCidade + 1);
 
 	Subset conjuntos[maxCidade + 1];
 	ptrSubsets = conjuntos;
 
-	Edge resultado[maxCidade];
-	ptrResultado = resultado;
-
-	for(i = 0; i < numEdges; i++) {
-		ptrEdges[i].parent = -1;
-		ptrEdges[i].id = -1;
-		ptrEdges[i].custo = -1;
+	/*inicializacao do vector que vai guardar as informacoes das edges dos aeroportos */
+	for(i = 0; i < maxAeroporto; i++) {
+		ptrEdgesAero[i].parent = -1;
+		ptrEdgesAero[i].id = -1;
+		ptrEdgesAero[i].custo = -1;
 	}
-
-	for(i = 0; i < maxCidade; i++) {
-		ptrResultado[i].parent = -1;
-		ptrResultado[i].id = -1;
-		ptrResultado[i].custo = 0;
-	}
-
-	/* a posicao i = maxCidade sera o vertice extra, sky, que e comum a todas as cidades que tiverem aeroporto */
 
 	int aeroporto_id, custo_aero;
-	int max_cost = 0;
 
-	for(i = 0; i < maxAeroporto; i++){
+	/* leitura e alteracao dos dados respectivos as ligacoes que incluem aeroportos */
+	for(i = 0; i < maxAeroporto; i++) {
 		scanf("%d %d", &aeroporto_id, &custo_aero);
 
-		if(custo_aero > max_cost) {
-			max_cost = custo_aero;
-		}
+		ptrEdgesAero[i].id = aeroporto_id;
+		ptrEdgesAero[i].custo = custo_aero;
+		ptrEdgesAero[i].parent = maxCidade + 1;
 
-		edges[i].id = aeroporto_id;
-		ptrEdges[i].custo = custo_aero;
-		ptrEdges[i].parent = maxCidade + 1;
-
-		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
+		printf("ptrEdgesAero[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesAero[i].parent, ptrEdgesAero[i].id, ptrEdgesAero[i].custo);
 	}
+
+
 
 	int maxEstradas, cidadeA, cidadeB, custoEstradaAB;
 
 	scanf("%d", &maxEstradas);
 
+	/*ciracao de um vector que vai guardar as edges que apenas incluem estradas */
+	ptrEdgesSemAero = (Edge *) malloc(sizeof(Edge) * maxEstradas);
+
+	Edge edgesSemAero[maxEstradas];
+	ptrEdgesSemAero = edgesSemAero;
+
+
+	/* numero maximo de edges do grafo*/
 	numEdges = maxAeroporto + maxEstradas;
 
-	/*printf(" maxEstradas %d\n", maxEstradas);*/
 
-	for(i = maxAeroporto; i < (maxAeroporto + maxEstradas); i++) {
+	/*criacao de ponteiro para o vector que vai guardar o numero total de edges e as suas informacoes */
+	ptrEdges = (Edge *) malloc(sizeof(Edge) * numEdges);
+
+	Edge totalEdges[numEdges];
+	ptrEdges = totalEdges;
+
+	/* inicializacao dos valores recebidos para as ligacoes que incluem estradas */
+
+	for(i = 0; i < maxEstradas; i++) {
 		scanf("%d %d %d", &cidadeA, &cidadeB, &custoEstradaAB);
 
-		if(custoEstradaAB > max_cost) {
-			max_cost = custoEstradaAB;
+		ptrEdgesSemAero[i].id = cidadeB;
+		ptrEdgesSemAero[i].custo = custoEstradaAB;
+		ptrEdgesSemAero[i].parent = cidadeA;
+
+		printf("ptrEdgesSemAero[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesSemAero[i].parent, ptrEdgesSemAero[i].id, ptrEdgesSemAero[i].custo);
+	}
+
+	/*incializacao do vector que guarda a informacao total do grafo*/
+
+	for(i = 0; i < numEdges; i++) {
+		if(i <= maxAeroporto - 1) {
+			ptrEdges[i].id = ptrEdgesAero[i].id;
+			ptrEdges[i].parent = ptrEdgesAero[i].parent;
+			ptrEdges[i].custo = ptrEdgesAero[i].custo;
 		}
 
-		ptrEdges[i].id = cidadeB;
-		ptrEdges[i].custo = custoEstradaAB;
-		ptrEdges[i].parent = cidadeA;
-
-		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
+		else if(i >= maxAeroporto) {
+			ptrEdges[i].id = ptrEdgesSemAero[i - maxAeroporto].id;
+			ptrEdges[i].parent = ptrEdgesSemAero[i - maxAeroporto].parent;
+			ptrEdges[i].custo = ptrEdgesSemAero[i - maxAeroporto].custo;
+		}
 	}
+
+
 
 	/****************   COLOCAR TUDO NUM VECTOR ORDENADO   ****************/
 
-	for(i = 0; i < numEdges; i++) {
-		if(ptrEdges[i].parent == -1 && ptrEdges[i].id ==-1) {
+	printf("\n ---  VECTOR DESORDENADO   ---\n\n");
 
-			ptrEdges[i].custo = max_cost+1;
-		}
+	for(i = 0; i < numEdges; i++) {
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
+
 	}
+
 
 	qsort(ptrEdges, numEdges, sizeof(Edge), qcmp);
 
@@ -271,16 +290,16 @@ int main() {
 
 	kruskal();
 
-	ptrEdgesSemAero = ptrEdges;
-
-	qsort(ptrEdgesSemAero, numEdges, sizeof(Edge), cmpWithoutAer);
-
-	printf("\n ---  VECTOR ORDENADO POR PESOS SEM AERO   ---\n\n");
-
-	for(i = 0; i < numEdges; i++) {
-		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
-
-	}
+	// ptrEdgesSemAero = ptrEdges;
+	//
+	// qsort(ptrEdgesSemAero, numEdges, sizeof(Edge), cmpWithoutAer);
+	//
+	// printf("\n ---  VECTOR ORDENADO POR PESOS SEM AERO   ---\n\n");
+	//
+	// for(i = 0; i < numEdges; i++) {
+	// 	printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
+	//
+	// }
 
 
 
