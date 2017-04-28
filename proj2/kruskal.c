@@ -19,16 +19,16 @@
 
 typedef struct edge{
 
-	long long int id;
-	long long int custo;
-	long long int parent;
+	int id;
+	int custo;
+	int parent;
 
 } Edge;
 
 
 typedef struct set{
-	long long int parent;
-	long long int rank;
+	int parent;
+	int rank;
 } Subset;
 
 
@@ -37,30 +37,30 @@ Subset *ptrSubsets;
 Edge *ptrEdgesSemAero;
 Edge *ptrEdgesAero;
 
-long long int numEdges;
-long long int maxCidade;
-long long int maxAeroporto;
-long long int maxEstradas;
+int numEdges;
+int maxCidade;
+int maxAeroporto;
+int maxEstradas;
 
-long long int custo_total;
-long long int num_aero;
-long long int num_roads;
+int custo_total;
+int num_aero;
+int num_roads;
 
-long long int cont; /*conta o numero cidades ja contabilizados */
+int cont; /*conta o numero cidades ja contabilizados */
 
-long long int flag; /* serve para identificar qual o vector o qual o Kruskal vai correr;
+int flag; /* serve para identificar qual o vector o qual o Kruskal vai correr;
 		     se for 0, corre o ptrEdges. Se for 1, corre o ptrEdgesSemAero. */
 
 
-void makeSubSet(long long int v) {
+void makeSubSet(int v) {
 	ptrSubsets[v].parent = v;
 	ptrSubsets[v].rank = 0;
-	prlong long intf("\n ptrSubset[%d].parent = %d\n",v, ptrSubsets[v].parent);
-	prlong long intf("ptrSubset[%d].rank = %d\n",v, ptrSubsets[v].rank);
+	printf("\n ptrSubset[%d].parent = %d\n",v, ptrSubsets[v].parent);
+	printf("ptrSubset[%d].rank = %d\n",v, ptrSubsets[v].rank);
 }
 
 
-long long int qcmp(const void *p, const void *q)  {
+int qcmp(const void *p, const void *q)  {
 	/* O qcmp passa ponteiros para as posicoes e nao os valores
 	* Assim, temos que por o ponteiro a apontar para cidade e depois, desreferenciamo-lo*/
 
@@ -83,24 +83,24 @@ long long int qcmp(const void *p, const void *q)  {
 
 
 
-long long int findSet(long long int i) {
+int findSet(int i) {
 
-	prlong long intf("\nfindSet : i = %d\n", i);
-	prlong long intf("findSet : ptrSubsets[%d].parent = %d\n", i, ptrSubsets[i].parent);
+	printf("\nfindSet : i = %d\n", i);
+	printf("findSet : ptrSubsets[%d].parent = %d\n", i, ptrSubsets[i].parent);
 
 	if(i != ptrSubsets[i].parent) {
 		ptrSubsets[i].parent = findSet(ptrSubsets[i].parent);
 	}
 
-	prlong long intf("\nfindSet : ptrSubsets[%d].parent = %d\n", i, ptrSubsets[i].parent);
+	printf("\nfindSet : ptrSubsets[%d].parent = %d\n", i, ptrSubsets[i].parent);
 	return ptrSubsets[i].parent;
 }
 
 
-void linkSet(long long int src, long long int dest) {
+void linkSet(int src, int dest) {
 
-	long long int src_raiz = findSet(src);
-	long long int dest_raiz = findSet(dest);
+	int src_raiz = findSet(src);
+	int dest_raiz = findSet(dest);
 
 	if(ptrSubsets[src_raiz].rank < ptrSubsets[dest_raiz].rank) {
 		ptrSubsets[src_raiz].parent = dest_raiz;
@@ -118,7 +118,7 @@ void linkSet(long long int src, long long int dest) {
 
 void kruskal() {
 
-	long long int i;
+	int i;
 	cont = 0;
 
 	custo_total = 0;
@@ -135,8 +135,8 @@ void kruskal() {
 
 		for(i = 0; i < numEdges; i++) {
 
-			long long int src = findSet(ptrEdges[i].parent);
-			long long int dest = findSet(ptrEdges[i].id);
+			int src = findSet(ptrEdges[i].parent);
+			int dest = findSet(ptrEdges[i].id);
 
 			if(src != dest) {
 
@@ -167,8 +167,8 @@ void kruskal() {
 
 		for(i = 0; i < maxEstradas; i++) {
 
-			long long int src = findSet(ptrEdgesSemAero[i].parent);
-			long long int dest = findSet(ptrEdgesSemAero[i].id);
+			int src = findSet(ptrEdgesSemAero[i].parent);
+			int dest = findSet(ptrEdgesSemAero[i].id);
 
 			if(src != dest) {
 
@@ -195,9 +195,9 @@ void kruskal() {
 
 
 
-long long int main() {
+int main() {
 
-	long long int i;
+	int i;
 
 	scanf("%d", &maxCidade);
 	scanf("%d", &maxAeroporto);
@@ -225,7 +225,7 @@ long long int main() {
 		ptrEdgesAero[i].custo = -1;
 	}
 
-	long long int aeroporto_id, custo_aero;
+	int aeroporto_id, custo_aero;
 
 	/* leitura e alteracao dos dados respectivos as ligacoes que incluem aeroportos */
 	for(i = 0; i < maxAeroporto; i++) {
@@ -235,12 +235,12 @@ long long int main() {
 		ptrEdgesAero[i].custo = custo_aero;
 		ptrEdgesAero[i].parent = maxCidade + 1;
 
-		prlong long intf("ptrEdgesAero[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesAero[i].parent, ptrEdgesAero[i].id, ptrEdgesAero[i].custo);
+		printf("ptrEdgesAero[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesAero[i].parent, ptrEdgesAero[i].id, ptrEdgesAero[i].custo);
 	}
 
 
 
-	long long int cidadeA, cidadeB, custoEstradaAB;
+	int cidadeA, cidadeB, custoEstradaAB;
 
 	scanf("%d", &maxEstradas);
 
@@ -270,7 +270,7 @@ long long int main() {
 		ptrEdgesSemAero[i].custo = custoEstradaAB;
 		ptrEdgesSemAero[i].parent = cidadeA;
 
-		prlong long intf("ptrEdgesSemAero[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesSemAero[i].parent, ptrEdgesSemAero[i].id, ptrEdgesSemAero[i].custo);
+		printf("ptrEdgesSemAero[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesSemAero[i].parent, ptrEdgesSemAero[i].id, ptrEdgesSemAero[i].custo);
 	}
 
 	/*incializacao do vector que guarda a informacao total do grafo*/
@@ -293,39 +293,39 @@ long long int main() {
 
 	/****************   COLOCAR TUDO NUM VECTOR ORDENADO   ****************/
 
-	prlong long intf("\n ---  VECTOR DESORDENADO   ---\n\n");
+	printf("\n ---  VECTOR DESORDENADO   ---\n\n");
 
 	for(i = 0; i < numEdges; i++) {
-		prlong long intf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
 
 	}
 
 
 	qsort(ptrEdges, numEdges, sizeof(Edge), qcmp);
 
-	prlong long intf("\n ---  VECTOR ORDENADO POR PESOS TOTAL   ---\n\n");
+	printf("\n ---  VECTOR ORDENADO POR PESOS TOTAL   ---\n\n");
 
 	for(i = 0; i < numEdges; i++) {
-		prlong long intf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdges[i].parent, ptrEdges[i].id, ptrEdges[i].custo);
 
 	}
 
 
 	kruskal();
 
-	long long int maxcost = custo_total;
-	long long int num_aer_aux = num_aero;
-	long long int num_roads_aux = num_roads;
+	int maxcost = custo_total;
+	int num_aer_aux = num_aero;
+	int num_roads_aux = num_roads;
 
-	prlong long intf("\n maxcost = %d; num_aer_aux = %d ; num_roads_aux = %d\n", maxcost, num_aer_aux, num_roads_aux);
+	printf("\n maxcost = %d; num_aer_aux = %d ; num_roads_aux = %d\n", maxcost, num_aer_aux, num_roads_aux);
 
 
 	qsort(ptrEdgesSemAero, maxEstradas, sizeof(Edge), qcmp);
 
-	prlong long intf("\n ---  VECTOR ORDENADO POR PESOS SEM AERO   ---\n\n");
+	printf("\n ---  VECTOR ORDENADO POR PESOS SEM AERO   ---\n\n");
 
 	for(i = 0; i < maxEstradas; i++) {
-		prlong long intf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesSemAero[i].parent, ptrEdgesSemAero[i].id, ptrEdgesSemAero[i].custo);
+		printf("ptrEdges[%d] = parent: %d id: %d Custo = %d\n", i, ptrEdgesSemAero[i].parent, ptrEdgesSemAero[i].id, ptrEdgesSemAero[i].custo);
 
 	}
 
@@ -337,26 +337,26 @@ long long int main() {
 
 	if(custo_total <= maxcost) {
 		if(cont < maxCidade - 1) {
-			prlong long intf("\n\n CONT = %d\n\n\n", cont);
-			prlong long intf("Insuficiente\n");
+			printf("\n\n CONT = %d\n\n\n", cont);
+			printf("Insuficiente\n");
 
 		}
 
 		else {
-			prlong long intf("%d\n%d %d\n", custo_total, num_aero, num_roads);
+			printf("%d\n%d %d\n", custo_total, num_aero, num_roads);
 		}
 	}
 
 	else if(custo_total > maxcost) {
 
 		if(cont < maxCidade - 1) {
-			prlong long intf("\n\n CONT = %d\n\n\n", cont);
-			prlong long intf("Insuficiente\n");
+			printf("\n\n CONT = %d\n\n\n", cont);
+			printf("Insuficiente\n");
 
 		}
 
 		else {
-			prlong long intf("%d\n%d %d\n", maxcost, num_aer_aux, num_roads_aux);
+			printf("%d\n%d %d\n", maxcost, num_aer_aux, num_roads_aux);
 		}
 	}
 
