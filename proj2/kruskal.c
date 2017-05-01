@@ -49,7 +49,7 @@ int num_roads;
 int cont; /*conta o numero cidades ja contabilizados */
 
 int flag; /* serve para identificar qual o vector o qual o Kruskal vai correr;
-		     se for 0, corre o ptrEdges. Se for 1, corre o ptrEdgesSemAero. */
+se for 0, corre o ptrEdges. Se for 1, corre o ptrEdgesSemAero. */
 
 
 void makeSubSet(int v) {
@@ -69,7 +69,7 @@ int qcmp(const void *p, const void *q)  {
 	Edge y = *((Edge const *) q);
 
 	if( x.custo == y.custo) {
-		if(x.parent != maxCidade+1) {
+		if(x.parent != maxCidade + 1) {
 			return -1;
 		}
 
@@ -157,40 +157,40 @@ void kruskal() {
 				}
 
 				/*else if(cont < maxCidade) {
-				 	break;
-				}*/
+				break;
+			}*/
+		}
+	}
+}
+
+else if(flag == 1) {
+
+	for(i = 0; i < maxEstradas; i++) {
+
+		int src = findSet(ptrEdgesSemAero[i].parent);
+		int dest = findSet(ptrEdgesSemAero[i].id);
+
+		if(src != dest) {
+
+			custo_total += ptrEdgesSemAero[i].custo;
+
+			if(ptrEdgesSemAero[cont].parent == maxCidade + 1) {
+				num_aero++;
+			}
+
+			else {
+				num_roads++;
+			}
+			cont++;
+			linkSet(src, dest);
+
+			if(cont == maxCidade) {
+				break;
 			}
 		}
 	}
 
-	else if(flag == 1) {
-
-		for(i = 0; i < maxEstradas; i++) {
-
-			int src = findSet(ptrEdgesSemAero[i].parent);
-			int dest = findSet(ptrEdgesSemAero[i].id);
-
-			if(src != dest) {
-
-				custo_total += ptrEdgesSemAero[i].custo;
-
-				if(ptrEdgesSemAero[cont].parent == maxCidade + 1) {
-					num_aero++;
-				}
-
-				else {
-					num_roads++;
-				}
-				cont++;
-				linkSet(src, dest);
-
-				if(cont == maxCidade) {
-					break;
-				}
-			}
-		}
-
-	}
+}
 }
 
 
@@ -316,8 +316,12 @@ int main() {
 	int maxcost = custo_total;
 	int num_aer_aux = num_aero;
 	int num_roads_aux = num_roads;
+	int cont_aux = cont;
+
+
 
 	printf("\n maxcost = %d; num_aer_aux = %d ; num_roads_aux = %d\n", maxcost, num_aer_aux, num_roads_aux);
+
 
 
 	qsort(ptrEdgesSemAero, maxEstradas, sizeof(Edge), qcmp);
@@ -335,32 +339,28 @@ int main() {
 	kruskal();
 
 
-	if(custo_total <= maxcost) {
-		if(cont < maxCidade - 1) {
-			printf("\n\n CONT = %d\n\n\n", cont);
-			printf("Insuficiente\n");
-
-		}
-
-		else {
-			printf("%d\n%d %d\n", custo_total, num_aero, num_roads);
-		}
+	if(cont_aux < maxCidade && cont < maxCidade - 1) {
+		printf("Insuficiente\n");
+		return 0;
 	}
 
-	else if(custo_total > maxcost) {
 
-		if(cont < maxCidade - 1) {
-			printf("\n\n CONT = %d\n\n\n", cont);
-			printf("Insuficiente\n");
+	else if(cont < maxCidade - 1) {
 
+		printf("%d\n%d %d\n", maxcost, num_aer_aux, num_roads_aux);
+	}
+
+	else {
+
+		if(custo_total <= maxcost) {
+			printf("%d\n%d %d\n", custo_total, num_aero, num_roads);
 		}
 
 		else {
 			printf("%d\n%d %d\n", maxcost, num_aer_aux, num_roads_aux);
 		}
+
 	}
-
-
 
 	return 0;
 }
