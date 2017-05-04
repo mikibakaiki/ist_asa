@@ -2,7 +2,7 @@
 
 
 **1st Project: C**<br />
-<br />The 1st project was about using Djikstra's algorithm to find to sort some photographs in order which they were taken.
+<br />The 1st project was about using Djikstra's algorithm to sort some photographs by order in which they were taken.
 <br />
 <br />
 <br />
