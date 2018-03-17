@@ -1,42 +1,80 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-typedef struct supermarket{
-    int num;
+typedef struct node {
+    int index;
     int discovery;
     int lowest;
-    struct supermarket *next;
-} supermercado;
+    struct node *next;
+} *link;
 
 
-// static supermercado *head;
+typedef struct edge {
+    int v;
+    int w;
+} Edge;
 
-supermercado new(int numNo) {
+typedef struct graph {
+    int numVertices;
+    int numEdges;
+    link *list;
+} *Graph;
 
-    mercado = (supermercado) malloc(sizeof(struct supermarket));
 
-    mercado->num = numNo;
-    mercado->discovery = 0;
-    mercado->lowest = 0;
-    mercado->next = NULL;
+link InsertBegin(int index, link head) {
+    link x = malloc(sizeof(struct node));
 
-    return mercado;
+    x->index = index;
+    x->next = head;
+
+    return x;
 }
 
-supermercado insertEnd(int value) {
-    mercado = new(value);
+Graph GraphInit(int numVertices) {
+    int i;
+    Graph G = malloc(sizeof(struct graph));
+    G->numVertices = numVertices;
+    G->numEdges = 0;
+    G->list = malloc(numVertices*sizeof(link));
 
-    if(head == NULL) {
-        /*printf("head e null\n");*/
-        return new(value);
+    for (i = 0; i < numVertices; i++) {
+        G->list[i] = NULL;
     }
 
-    for(x = head; x->next != NULL; x = x->next);
+    return G;
+}
 
-    x->next = new(value);
+void GraphInsertEdge(Graph G, Edge e) {
+    int vert1 = e.v;
+    int vert2 = e.w;
 
-    return head;
+    G->list[vert1] = InsertBegin(vert1, G->list[vert1]);
+    G->list[vert2] = InsertBegin(vert2, G->list[vert2]);
+
+    G->numEdges++;
+}
+
+static int time = 0;
+
+void TarjanSCC(Graph G) {
+
+    // disc[u] = time;
+    // low[u] = time;
+    int visited = 0;
+
+    int *stack;
+    stack = malloc(sizeof(int) * G->numVertices);
+    int i;
+
+    for(i = 0; i < G->numVertices; i++) {
+        G->list[i]->discovery = -1;
+    }
+
+    for(i = 0; i < G->numVertices; i++) {
+        if(G->list[i]->discovery == -1) {
+            TarjanVisit(G->list[i]);
+        }
+    }
 }
 
 
@@ -63,22 +101,15 @@ supermercado insertEnd(int value) {
 
 
 
+int main()  {
+    /*Number of supermarkets*/
+    int numNodes;
 
+    /* Number of connections - arches*/
+    int numConnections;
 
+    int i;
 
+ 	scanf("%d %d", &numNodes, &numConnections);
 
-
-
-
-//int main()  {
-//     /* Number of supermarkets */
-//     int numNodes;
-//
-//     /* Number of connections - arches*/
-//     int numConnections;
-//
-//     int i;
-//
-// 	scanf("%d %d", &numNodes, &numConnections);
-//
-//}
+}
