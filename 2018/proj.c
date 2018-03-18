@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
+/* To compile, run: */
+/*gcc -ansi -g -Wall proj.c -o test*/
 typedef struct node {
     int index;
     int discovery;
