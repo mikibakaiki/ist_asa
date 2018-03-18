@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 typedef struct node {
     int index;
@@ -19,6 +20,11 @@ typedef struct graph {
     link *adj;
 } *Graph;
 
+// A structure to represent a stack
+struct StackNode {
+    int data;
+    struct StackNode* next;
+}*Stack;
 
 link InsertBegin(int index, link head) {
     link x = malloc(sizeof(struct node));
@@ -53,19 +59,66 @@ void GraphInsertEdge(Graph G, Edge e) {
     G->numEdges++;
 }
 
+Stack newNode(int data) {
+    Stack stackNode = (Stack) malloc(sizeof(struct StackNode));
+    stackNode->data = data;
+    stackNode->next = NULL;
+    return stackNode;
+}
+
+int isEmpty(Stack root) {
+    return !root;
+}
+
+void push(Stack *root, int data) {
+    Stack stackNode = newNode(data);
+    stackNode->next = *root;
+    *root = stackNode;
+    // printf("%d pushed to stack\n", data);
+}
+
+int pop(Stack *root) {
+    if (isEmpty(*root)) {
+        return -1;
+    }
+    Stack temp = *root;
+    *root = (*root)->next;
+    int popped = temp->data;
+    free(temp);
+
+    return popped;
+}
+
+int peek(Stack root) {
+    if (isEmpty(root))
+        return INT_MIN;
+    return root->data;
+}
+
+int checkStack(Stack *root, int index) {
+    Stack temp = *root;
+    int exists = 0;
+    while(exists == 0) {
+        if(temp->data == index) {
+            exists = 1;
+        }
+        else {
+            temp = *root->next;
+        }
+    }
+    return exists;
+}
+
 static int visited = 0;
+static Stack nodeStack = NULL;
 
 void TarjanSCC(Graph G) {
 
-    // disc[u] = time;
-    // low[u] = time;
-
-    int *stack;
-    stack = malloc(sizeof(int) * G->numVertices);
     int i;
 
     for(i = 0; i < G->numVertices; i++) {
         G->adj[i]->discovery = -1;
+        G->adj[i]->index = i+1;
     }
 
     for(i = 0; i < G->numVertices; i++) {
@@ -82,23 +135,31 @@ void TarjanVisit(Graph G, link vertex) {
     G->adj[vertex]->lowest = visited;
     visited++;
 
-    /* por o vertice na stack */
+    push(&nodeStack, G->adj[vertex]->index);
 
     int i;
     link *x;
+
     for(x = G->adj[vertex]; x->next != NULL; x = x->next) {
         if (x->discovery == -1) {
             TarjanVisit(G, &x);
             G->adj[vertex]->lowest = minimum(G->adj[vertex]->lowest, x->lowest);
         }
         /*ou se esse vertice estiver na stack*/
-        else if ( ) {
+        else if (checkStack(&nodeStack, G->adj[vertex]->index) == 1) {
             G->adj[vertex]->lowest = minimum(G->adj[vertex]->lowest, x->lowest);
         }
     }
-
+    int popped = -1;
+    int scc_list[];
+    int j = 0;
     /* this is the root of the SCC */
     if (G->adj[vertex]->discovery == G->adj[vertex]->lowest) {
+        while( popped != G->adj[vertex]->index) {
+            popped = pop(&nodeStack);
+            scc_list[j] = popped;
+            j++;
+        }
         /* retirar os elementos da stack/lista */
         /* até que G->adj[vertex]->index == ao elemento que saiu da lista */
     }
@@ -112,24 +173,6 @@ void TarjanVisit(Graph G, link vertex) {
 int minimum(int u, int v) {
     return u > v ? v : u;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
