@@ -157,17 +157,13 @@ void TarjanVisit(Graph G, link vertex) {
     if (G->adj[vertex]->discovery == G->adj[vertex]->lowest) {
         while( popped != G->adj[vertex]->index) {
             popped = pop(&nodeStack);
+            printf("popped element %d from stack.\n", popped);
             scc_list[j] = popped;
             j++;
         }
         /* retirar os elementos da stack/lista */
         /* até que G->adj[vertex]->index == ao elemento que saiu da lista */
     }
-}
-
-
-
-
 }
 
 int minimum(int u, int v) {
@@ -186,5 +182,25 @@ int main()  {
     int i;
 
  	scanf("%d %d", &numNodes, &numConnections);
+
+    Graph graph = GraphInit(int numNodes);
+
+    for(i = 0; i < numConnections; i++) {
+
+        int vertU, vertV;
+
+		scanf("%d %d", &vertU, &vertV);
+        Edge newEdge;
+        newEdge.v = vertU;
+        newEdge.w = vertV;
+
+        GraphInsertEdge(graph, newEdge);
+	}
+
+
+    TarjanSCC(graph);
+
+    return 0;
+
 
 }
