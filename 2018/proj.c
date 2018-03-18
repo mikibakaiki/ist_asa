@@ -126,12 +126,13 @@ void TarjanVisit(Graph G, int vertex) {
     visited++;
 
     push(&nodeStack, G->adj[vertex]->index);
-
+    printf("Pushed %d to stack\n", G->adj[vertex]->index);
     /*int i;*/
     link x;
 
     for(x = G->adj[vertex]; x->next != NULL; x = x->next) {
         if (x->discovery == -1) {
+            printf("am doing dfs\n\n");
             TarjanVisit(G, x->index);
             G->adj[vertex]->lowest = minimum(G->adj[vertex]->lowest, x->lowest);
         }
@@ -145,7 +146,12 @@ void TarjanVisit(Graph G, int vertex) {
     int j = 0;
     /* this is the root of the SCC */
     if (G->adj[vertex]->discovery == G->adj[vertex]->lowest) {
+        printf("Valor discovery do vertice %d: %d\n",vertex, G->adj[vertex]->discovery);
+        printf("Valor lowest do vertice %d: %d\n", vertex, G->adj[vertex]->lowest);
+        printf("value of popped before -> %d\n", popped);
+
         while( popped != G->adj[vertex]->index) {
+            printf("popped before popping again: %d\n", popped);
             popped = pop(&nodeStack);
             printf("popped element %d from stack.\n", popped);
             /*scc_list[j] = popped;*/
@@ -159,17 +165,17 @@ void TarjanVisit(Graph G, int vertex) {
 void TarjanSCC(Graph G) {
     printf("entrei no tarjanSCC\n");
     int i;
-    printf("vou inicializar os valores\n");
+    /*printf("vou inicializar os valores\n");*/
     for(i = 0; i < G->numVertices; i++) {
-        printf("vou colocar discovery a -1");
+        /*printf("vou colocar discovery a -1\n");*/
         G->adj[i]->discovery = -1;
     }
-    printf("inicializei os valores de discovery e indice\n");
+    /*printf("inicializei os valores de discovery\n");*/
 
     for(i = 0; i < G->numVertices; i++) {
-        printf("entrei no segundo for em tarjanSCC()\n");
+        /*printf("entrei no segundo for em tarjanSCC()\n");*/
         if(G->adj[i]->discovery == -1) {
-            printf("vou fazer o tarjan visit()\n");
+            /*printf("vou fazer o tarjan visit()\n");*/
             TarjanVisit(G, i);
         }
     }
