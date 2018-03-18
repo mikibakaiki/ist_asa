@@ -53,8 +53,8 @@ void GraphInsertEdge(Graph G, Edge e) {
     int vert1 = e.v;
     int vert2 = e.w;
 
-    G->adj[vert1] = InsertBegin(vert1, G->adj[vert1]);
-    G->adj[vert2] = InsertBegin(vert2, G->adj[vert2]);
+    G->adj[vert1-1] = InsertBegin(vert1-1, G->adj[vert1-1]);
+    G->adj[vert2-1] = InsertBegin(vert2-1, G->adj[vert2-1]);
 
     G->numEdges++;
 }
@@ -103,7 +103,7 @@ int checkStack(Stack *root, int index) {
             exists = 1;
         }
         else {
-            temp = *root->next;
+            temp = temp->next;
         }
     }
     return exists;
@@ -117,24 +117,9 @@ int minimum(int u, int v) {
 static int visited = 0;
 static Stack nodeStack = NULL;
 
-void TarjanSCC(Graph G) {
-
-    int i;
-
-    for(i = 0; i < G->numVertices; i++) {
-        G->adj[i]->discovery = -1;
-        G->adj[i]->index = i+1;
-    }
-
-    for(i = 0; i < G->numVertices; i++) {
-        if(G->adj[i]->discovery == -1) {
-            TarjanVisit(G, G->adj[i]);
-        }
-    }
-}
 
 
-void TarjanVisit(Graph G, link vertex) {
+void TarjanVisit(Graph G, int vertex) {
 
     G->adj[vertex]->discovery = visited;
     G->adj[vertex]->lowest = visited;
@@ -142,12 +127,12 @@ void TarjanVisit(Graph G, link vertex) {
 
     push(&nodeStack, G->adj[vertex]->index);
 
-    int i;
-    link *x;
+    /*int i;*/
+    link x;
 
     for(x = G->adj[vertex]; x->next != NULL; x = x->next) {
         if (x->discovery == -1) {
-            TarjanVisit(G, &x);
+            TarjanVisit(G, x->index);
             G->adj[vertex]->lowest = minimum(G->adj[vertex]->lowest, x->lowest);
         }
         /*ou se esse vertice estiver na stack*/
@@ -156,14 +141,14 @@ void TarjanVisit(Graph G, link vertex) {
         }
     }
     int popped = -1;
-    int scc_list[];
+    /*int scc_list[];*/
     int j = 0;
     /* this is the root of the SCC */
     if (G->adj[vertex]->discovery == G->adj[vertex]->lowest) {
         while( popped != G->adj[vertex]->index) {
             popped = pop(&nodeStack);
             printf("popped element %d from stack.\n", popped);
-            scc_list[j] = popped;
+            /*scc_list[j] = popped;*/
             j++;
         }
         /* retirar os elementos da stack/lista */
@@ -171,6 +156,24 @@ void TarjanVisit(Graph G, link vertex) {
     }
 }
 
+void TarjanSCC(Graph G) {
+    printf("entrei no tarjanSCC\n");
+    int i;
+    printf("vou inicializar os valores\n");
+    for(i = 0; i < G->numVertices; i++) {
+        printf("vou colocar discovery a -1");
+        G->adj[i]->discovery = -1;
+    }
+    printf("inicializei os valores de discovery e indice\n");
+
+    for(i = 0; i < G->numVertices; i++) {
+        printf("entrei no segundo for em tarjanSCC()\n");
+        if(G->adj[i]->discovery == -1) {
+            printf("vou fazer o tarjan visit()\n");
+            TarjanVisit(G, i);
+        }
+    }
+}
 
 
 
@@ -199,7 +202,8 @@ int main()  {
         GraphInsertEdge(graph, newEdge);
 	}
 
-
+    printf("numero de edges do grafo: %d\n", graph->numEdges);
+    printf("numero de nodes do grafo: %d\n", graph->numVertices);
     TarjanSCC(graph);
 
     return 0;
