@@ -20,11 +20,11 @@ typedef struct graph {
     link *adj;
 } *Graph;
 
-// A structure to represent a stack
-struct StackNode {
+/*A structure to represent a stack*/
+typedef struct StackNode {
     int data;
     struct StackNode* next;
-}*Stack;
+} *Stack;
 
 link InsertBegin(int index, link head) {
     link x = malloc(sizeof(struct node));
@@ -74,7 +74,7 @@ void push(Stack *root, int data) {
     Stack stackNode = newNode(data);
     stackNode->next = *root;
     *root = stackNode;
-    // printf("%d pushed to stack\n", data);
+    /*printf("%d pushed to stack\n", data);*/
 }
 
 int pop(Stack *root) {
@@ -108,6 +108,11 @@ int checkStack(Stack *root, int index) {
     }
     return exists;
 }
+
+int minimum(int u, int v) {
+    return u > v ? v : u;
+}
+
 
 static int visited = 0;
 static Stack nodeStack = NULL;
@@ -166,9 +171,6 @@ void TarjanVisit(Graph G, link vertex) {
     }
 }
 
-int minimum(int u, int v) {
-    return u > v ? v : u;
-}
 
 
 
@@ -183,7 +185,7 @@ int main()  {
 
  	scanf("%d %d", &numNodes, &numConnections);
 
-    Graph graph = GraphInit(int numNodes);
+    Graph graph = GraphInit(numNodes);
 
     for(i = 0; i < numConnections; i++) {
 
