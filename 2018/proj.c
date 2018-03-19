@@ -6,22 +6,14 @@
 /*gcc -ansi -g -Wall proj.c -o test*/
 
 typedef struct node {
-    int index;
     int discovery;
     int lowest;
-    struct node *next;
-} *link;
-
-/*typedef struct edge {
-int v;
-int w;
-} Edge;
+} Node;
 
 typedef struct graph {
-int numVertices;
-int numEdges;
-link *adj;
-} *Graph;*/
+    int index;
+    struct graph *next;
+} *Link;
 
 /*A structure to represent a stack*/
 typedef struct StackNode {
@@ -29,37 +21,36 @@ typedef struct StackNode {
     struct StackNode* next;
 } *Stack;
 
-
-
 /* GLOBAL VARIABLES */
 
 int numNodes;
-link * head;
+static Link *head;
+/*int nodesVisited;*/
+Node *vertexInfo;
+int visited = 0;
+Stack nodeStack = NULL;
 
 
-link newNode(int value) {
-
-    link x = (link) malloc(sizeof(struct node));
-
+Link newNode(int value) {
+    Link x = (Link) malloc(sizeof(struct graph));
     x->index = value;
-    x->discovery = -1;
-    x->lowest = -1;
     x->next = NULL;
-
     return x;
 }
 
-link insertEnd(link head, int value) {
+Link insertEnd(Link nodeHead, int value) {
 
-    link x;
-    if(head == NULL) {
+    Link x;
+    if(nodeHead == NULL) {
         /*printf("head e null\n");*/
         return newNode(value);
     }
-    for(x = head; x->next != NULL; x = x->next);
+    for(x = nodeHead; x->next != NULL; x = x->next);
     x->next = newNode(value);
-    return head;
+    return nodeHead;
 }
+
+/* STACK ADT */
 
 Stack newStackNode(int data) {
     Stack stackNode = (Stack) malloc(sizeof(struct StackNode));
@@ -111,55 +102,59 @@ int checkStack(Stack *root, int index) {
     return exists;
 }
 
+/* STACK ADT END */
+
+
 int minimum(int u, int v) {
     return u > v ? v : u;
 }
 
 
-static int visited = 0;
-static Stack nodeStack = NULL;
-
-
 void TarjanVisit(int vert) {
 
-    head[vert]->discovery = visited;
-    head[vert]->lowest = visited;
+    // if( nodesVisited != 0) {}
+    vertexInfo[vert].discovery = visited;
+    vertexInfo[vert].lowest = visited;
     visited++;
 
-    push(&nodeStack, head[vert]->index);
-    printf("Pushed %d to stack\n", head[vert]->index);
+    push(&nodeStack, vert);
+    printf("Pushed %d to stack\n", vert);
+    printf("Stack top = %d\n", peek(nodeStack));
 
-    link x;
+    Link x;
 
-    for(x = head[vert]->next; x != NULL; x = x->next) {
-        if (x->discovery == -1) {
+    for(x = head[vert]; x != NULL; x = x->next) {
+        if (vertexInfo[x->index].discovery == -1) {
             printf("am doing dfs\n\n");
+            // nodesVisited --;
             TarjanVisit(x->index);
-            head[vert]->lowest = minimum(head[vert]->lowest, x->lowest);
+            vertexInfo[vert].lowest = minimum(vertexInfo[vert].lowest, vertexInfo[x->index].lowest);
         }
         /*ou se esse vertice estiver na stack*/
         else if (checkStack(&nodeStack, x->index) == 1) {
-            head[vert]->lowest = minimum(head[vert]->lowest, x->lowest);
+            vertexInfo[vert].lowest = minimum(vertexInfo[vert].lowest, vertexInfo[x->index].lowest);
         }
     }
+
     int popped = -1;
 
     // int j = 0;
     /* this is the root of the SCC */
-    if (head[vert]->discovery == head[vert]->lowest) {
+    if (vertexInfo[vert].discovery == vertexInfo[vert].lowest) {
         /*printf("Valor discovery do vertice %d: %d\n",vertex, G->adj[vertex]->discovery);*/
         /*printf("Valor lowest do vertice %d: %d\n", vertex, G->adj[vertex]->lowest);*/
         /*printf("value of popped before -> %d\n", popped);*/
 
-        while( popped != head[vert]->index) {
+        /* retirar os elementos da stack */
+        /* até que vert == popped */
+        while( popped != vert) {
             /*printf("popped before popping again: %d\n", popped);*/
             popped = pop(&nodeStack);
             printf("popped element %d from stack.\n", popped);
             /*scc_list[j] = popped;
             j++;*/
         }
-        /* retirar os elementos da stack/lista */
-        /* até que G->adj[vertex]->index == ao elemento que saiu da lista */
+        printf("acabou o conjunto\n");
     }
 }
 
@@ -170,7 +165,7 @@ void TarjanSCC() {
 
     for(k = 0; k < numNodes; k++) {
         // printf("entrei no segundo for em tarjanSCC()\n");
-        if(head[k]->discovery == -1) {
+        if(vertexInfo[k].discovery == -1) {
             printf("vou fazer o tarjan visit() do vertice %d\n", k);
             TarjanVisit(k);
         }
@@ -187,15 +182,19 @@ int main()  {
 
     scanf("%d %d", &numNodes, &numConnections);
 
-    head = (link*) malloc(numNodes*sizeof(link));
-    for (i = 0; i < numConnections; i++) {
-        head[i] = insertEnd(head[i], i);
+    /*nodesVisited = numNodes;*/
+
+    head = (Link*) malloc(numNodes * sizeof(Link));
+
+    vertexInfo = malloc(numNodes * sizeof(Node));
+
+    for (i = 0; i < numNodes; i++) {
+        vertexInfo[i].discovery = -1;
+        vertexInfo[i].lowest = -1;
     }
 
     for(i = 0; i < numConnections; i++) {
-
         int vertU, vertV;
-
         scanf("%d %d", &vertU, &vertV);
         head[vertU-1] = insertEnd(head[vertU-1], vertV-1);
     }
@@ -204,6 +203,11 @@ int main()  {
     // printf("numero de nodes do grafo: %d\n", graph->numVertices);
     TarjanSCC();
 
+    for(i = 0; i < numNodes; i++) {
+        free(head[i]);
+    }
+    free(head);
+    free(vertexInfo);
     /*printf("SCC:\n");
     for(i = 0; i < 3; i++) {
     printf("%d\n", scc_list[i]);
