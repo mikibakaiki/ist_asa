@@ -29,6 +29,7 @@ static Link *head;
 Node *vertexInfo;
 int visited = 0;
 Stack nodeStack = NULL;
+int conjuntos = 0;
 
 
 Link newNode(int value) {
@@ -90,16 +91,16 @@ int peek(Stack root) {
 
 int checkStack(Stack *root, int index) {
     Stack temp = *root;
-    int exists = 0;
-    while(exists == 0) {
+    // while(temp->next != NULL) {
+    while(temp != NULL) {
         if(temp->data == index) {
-            exists = 1;
+            return 1;
         }
         else {
             temp = temp->next;
         }
     }
-    return exists;
+    return 0;
 }
 
 /* STACK ADT END */
@@ -138,23 +139,18 @@ void TarjanVisit(int vert) {
 
     int popped = -1;
 
-    // int j = 0;
     /* this is the root of the SCC */
     if (vertexInfo[vert].discovery == vertexInfo[vert].lowest) {
-        /*printf("Valor discovery do vertice %d: %d\n",vertex, G->adj[vertex]->discovery);*/
-        /*printf("Valor lowest do vertice %d: %d\n", vertex, G->adj[vertex]->lowest);*/
-        /*printf("value of popped before -> %d\n", popped);*/
-
         /* retirar os elementos da stack */
         /* até que vert == popped */
-        while( popped != vert) {
+        while (popped != vert) {
             /*printf("popped before popping again: %d\n", popped);*/
             popped = pop(&nodeStack);
             printf("popped element %d from stack.\n", popped);
-            /*scc_list[j] = popped;
-            j++;*/
         }
+        conjuntos++;
         printf("acabou o conjunto\n");
+        printf("\nNUMERO DE CONJUNTOS: %d\n", conjuntos);
     }
 }
 
@@ -186,7 +182,7 @@ int main()  {
 
     head = (Link*) malloc(numNodes * sizeof(Link));
 
-    vertexInfo = malloc(numNodes * sizeof(Node));
+    vertexInfo = (Node *) malloc(numNodes * sizeof(Node));
 
     for (i = 0; i < numNodes; i++) {
         vertexInfo[i].discovery = -1;
