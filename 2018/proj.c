@@ -8,6 +8,7 @@
 typedef struct node {
     int discovery;
     int lowest;
+    int scc;
 } Node;
 
 typedef struct graph {
@@ -30,6 +31,7 @@ Node *vertexInfo;
 int visited = 0;
 Stack nodeStack = NULL;
 int conjuntos = 0;
+int scc = 0;
 
 
 Link newNode(int value) {
@@ -147,7 +149,10 @@ void TarjanVisit(int vert) {
             /*printf("popped before popping again: %d\n", popped);*/
             popped = pop(&nodeStack);
             printf("popped element %d from stack.\n", popped);
+            vertexInfo[popped].scc = scc;
+            printf("\nscc = %d\n", vertexInfo[popped].scc);
         }
+        scc++;
         conjuntos++;
         printf("acabou o conjunto\n");
         printf("\nNUMERO DE CONJUNTOS: %d\n", conjuntos);
@@ -178,8 +183,6 @@ int main()  {
 
     scanf("%d %d", &numNodes, &numConnections);
 
-    /*nodesVisited = numNodes;*/
-
     head = (Link*) malloc(numNodes * sizeof(Link));
 
     vertexInfo = (Node *) malloc(numNodes * sizeof(Node));
@@ -187,6 +190,7 @@ int main()  {
     for (i = 0; i < numNodes; i++) {
         vertexInfo[i].discovery = -1;
         vertexInfo[i].lowest = -1;
+        vertexInfo[i].scc = -1;
     }
 
     for(i = 0; i < numConnections; i++) {
@@ -204,13 +208,6 @@ int main()  {
     }
     free(head);
     free(vertexInfo);
-    /*printf("SCC:\n");
-    for(i = 0; i < 3; i++) {
-    printf("%d\n", scc_list[i]);
-}*/
 
-
-return 0;
-
-
+    return 0;
 }
