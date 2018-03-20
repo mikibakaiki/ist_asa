@@ -26,7 +26,6 @@ typedef struct StackNode {
 
 int numNodes;
 static Link *head;
-/*int nodesVisited;*/
 Node *vertexInfo;
 int visited = 0;
 Stack nodeStack = NULL;
@@ -45,7 +44,6 @@ Link insertEnd(Link nodeHead, int value) {
 
     Link x;
     if(nodeHead == NULL) {
-        /*printf("head e null\n");*/
         return newNode(value);
     }
     for(x = nodeHead; x->next != NULL; x = x->next);
@@ -93,7 +91,7 @@ int peek(Stack root) {
 
 int checkStack(Stack *root, int index) {
     Stack temp = *root;
-    // while(temp->next != NULL) {
+
     while(temp != NULL) {
         if(temp->data == index) {
             return 1;
