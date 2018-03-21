@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <list>
+#include <iostream>
+
+
 
 /* To compile, run: */
 /*gcc -ansi -g -Wall proj.c -o test*/
@@ -31,6 +35,8 @@ int visited = 0;
 Stack nodeStack = NULL;
 int conjuntos = 0;
 int scc = 0;
+std::list< std::list<int> > sccBundle;
+std::list<int> sccSubNet;
 
 
 Link newNode(int value) {
@@ -49,6 +55,25 @@ Link insertEnd(Link nodeHead, int value) {
     for(x = nodeHead; x->next != NULL; x = x->next);
     x->next = newNode(value);
     return nodeHead;
+}
+
+void removeNode(Link nodeHead, int headIndex) {
+    Link current, previous;
+    previous = NULL;
+
+    for (current = nodeHead; current != NULL; previous = current, current = current->next) {
+        if (vertexInfo[current->index].scc == vertexInfo[headIndex].scc) {  /* Found it. */
+            if (previous == NULL) {
+                /* Fix beginning pointer. */
+                nodeHead = current->next;
+            }
+            else {
+                previous->next = current->next;
+            }
+            free(current);
+            return;
+        }
+    }
 }
 
 /* STACK ADT */
@@ -148,11 +173,17 @@ void TarjanVisit(int vert) {
             popped = pop(&nodeStack);
             printf("popped element %d from stack.\n", popped);
             vertexInfo[popped].scc = scc;
+            sccSubNet.push_back(popped);
             printf("\nscc = %d\n", vertexInfo[popped].scc);
         }
         scc++;
         conjuntos++;
         printf("acabou o conjunto\n");
+        for (int n : sccSubNet) {
+            std::cout << n << '\n';
+        }
+        sccBundle.push_back(sccSubNet);
+        sccSubNet.clear();
         printf("\nNUMERO DE CONJUNTOS: %d\n", conjuntos);
     }
 }
@@ -171,7 +202,23 @@ void TarjanSCC() {
     }
 }
 
-
+// void checkSCCEdges() {
+//     int i = 0;
+//     int sccId;
+//     int conter = scc;
+//     // for(i = 0; i < numNodes; i++) {
+//     while(counter != 0) {
+//         link x;
+//         sccId = vertexInfo[i].scc;
+//         for(x = head[i]; x != NULL; x = x->next) {
+//             if(vertexInfo[x->index] != sccId) {
+//                 counter--;
+//             }
+//         }
+//         i++;
+//     }
+//
+// }
 
 int main()  {
     /* Number of connections - arches*/
@@ -206,6 +253,24 @@ int main()  {
     }
     free(head);
     free(vertexInfo);
+
+    // for (std::list<int> n : sccBundle) {
+    //     std::cout << n << '\n';
+    //
+    // }
+
+    printf("Lista de todos os SCC\n");
+    for ( std::list<int> inner_list : sccBundle ) {
+        printf("[ ");
+        for (int item : inner_list ) {
+            printf("%d ", item+1);
+            // std::cout << item << "], ";
+        }
+        printf("], ");
+
+        // std::cout << endl << "End" << endl;
+    }
+    printf("\n");
 
     return 0;
 }
