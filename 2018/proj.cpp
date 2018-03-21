@@ -37,6 +37,7 @@ int conjuntos = 0;
 int scc = 0;
 std::list< std::list<int> > sccBundle;
 std::list<int> sccSubNet;
+Link *sccHead;
 
 
 Link newNode(int value) {
@@ -52,7 +53,11 @@ Link insertEnd(Link nodeHead, int value) {
     if(nodeHead == NULL) {
         return newNode(value);
     }
-    for(x = nodeHead; x->next != NULL; x = x->next);
+    for(x = nodeHead; x->next != NULL; x = x->next) {
+        if(x->index == value) {
+            return nodeHead;
+        }
+    }
     x->next = newNode(value);
     return nodeHead;
 }
@@ -140,7 +145,7 @@ bool compare_a(int first, int second ) {
 }
 
 void TarjanVisit(int vert) {
-    
+
     vertexInfo[vert].discovery = visited;
     vertexInfo[vert].lowest = visited;
     visited++;
@@ -203,23 +208,29 @@ void TarjanSCC() {
 }
 
 
-// void checkSCCEdges() {
-//     int i = 0;
-//     int sccId;
-//     int conter = scc;
-//     // for(i = 0; i < numNodes; i++) {
-//     while(counter != 0) {
-//         link x;
-//         sccId = vertexInfo[i].scc;
-//         for(x = head[i]; x != NULL; x = x->next) {
-//             if(vertexInfo[x->index] != sccId) {
-//                 counter--;
-//             }
-//         }
-//         i++;
-//     }
-//
-// }
+void sccEdges() {
+
+    int i, j, x, y;
+    for(i = 0; i < (int) sccBundle.size() - 2; i++) {
+        for(j = 0; j < (int) sccBundle[std::list <int>].size(); j++) {
+            int x = vertexInfo[j].scc;
+            Link ptr;
+            for(ptr = head[x]; ptr->next != NULL; ptr = ptr->next) {
+                y = vertexInfo[ptr->next->index].scc;
+                if(y != x) {
+                    sccHead[x] = insertEnd(sccHead[x], y);
+                }
+            }
+        }
+    }
+}
+
+void printList(Link head) {
+    link t;
+    for(t = head; t != NULL; t = t->next) {
+        printf("%d\n", t->index);
+    }
+}
 
 int main()  {
     /* Number of connections - arches*/
@@ -229,7 +240,7 @@ int main()  {
 
     scanf("%d %d", &numNodes, &numConnections);
 
-    head = (Link*) malloc(numNodes * sizeof(Link));
+    head = (Link *) malloc(numNodes * sizeof(Link));
 
     vertexInfo = (Node *) malloc(numNodes * sizeof(Node));
 
@@ -245,9 +256,21 @@ int main()  {
         head[vertU-1] = insertEnd(head[vertU-1], vertV-1);
     }
 
-    // printf("numero de edges do grafo: %d\n", graph->numEdges);
-    // printf("numero de nodes do grafo: %d\n", graph->numVertices);
     TarjanSCC();
+
+    sccHead = (Link *) malloc((sccBundle.size() - 1)* sizeof(Link));
+
+    for(i = 0; i < sccBundle.size() - 1; i++){
+        sccHead[i] = NULL;
+    }
+
+    sccEdges();
+
+    for(i = 0; i < sccBundle.size() - 1; i++){
+
+        printList(sccHead[i]);
+    }
+
 
     for(i = 0; i < numNodes; i++) {
         free(head[i]);
