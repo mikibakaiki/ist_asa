@@ -140,8 +140,7 @@ bool compare_a(int first, int second ) {
 }
 
 void TarjanVisit(int vert) {
-
-    // if( nodesVisited != 0) {}
+    
     vertexInfo[vert].discovery = visited;
     vertexInfo[vert].lowest = visited;
     visited++;
