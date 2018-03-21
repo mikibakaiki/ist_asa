@@ -135,6 +135,9 @@ int minimum(int u, int v) {
     return u > v ? v : u;
 }
 
+bool compare_a(int first, int second ) {
+    return first < second;
+}
 
 void TarjanVisit(int vert) {
 
@@ -173,16 +176,14 @@ void TarjanVisit(int vert) {
             popped = pop(&nodeStack);
             printf("popped element %d from stack.\n", popped);
             vertexInfo[popped].scc = scc;
-            sccSubNet.push_back(popped);
+            sccSubNet.push_front(popped);
             printf("\nscc = %d\n", vertexInfo[popped].scc);
         }
         scc++;
         conjuntos++;
         printf("acabou o conjunto\n");
-        for (int n : sccSubNet) {
-            std::cout << n << '\n';
-        }
-        sccBundle.push_back(sccSubNet);
+        sccSubNet.sort(compare_a);
+        sccBundle.push_front(sccSubNet);
         sccSubNet.clear();
         printf("\nNUMERO DE CONJUNTOS: %d\n", conjuntos);
     }
@@ -201,6 +202,7 @@ void TarjanSCC() {
         }
     }
 }
+
 
 // void checkSCCEdges() {
 //     int i = 0;
@@ -254,23 +256,20 @@ int main()  {
     free(head);
     free(vertexInfo);
 
-    // for (std::list<int> n : sccBundle) {
-    //     std::cout << n << '\n';
-    //
-    // }
-
     printf("Lista de todos os SCC\n");
     for ( std::list<int> inner_list : sccBundle ) {
-        printf("[ ");
+        printf("[");
         for (int item : inner_list ) {
             printf("%d ", item+1);
             // std::cout << item << "], ";
         }
-        printf("], ");
-
-        // std::cout << endl << "End" << endl;
+        printf("]");
     }
+
     printf("\n");
+
+    /* RESPOSTAS DO PROJECTO */
+    std::cout << sccBundle.size() << "\n";
 
     return 0;
 }
