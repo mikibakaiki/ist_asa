@@ -3,6 +3,10 @@
 #include <limits.h>
 #include <list>
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <set>
+
 
 
 
@@ -14,6 +18,11 @@ typedef struct node {
     int lowest;
     int scc;
 } Node;
+
+typedef struct scc {
+    int u;
+    int v;
+} sccEdge;
 
 typedef struct graph {
     int index;
@@ -28,18 +37,28 @@ typedef struct StackNode {
 
 /* GLOBAL VARIABLES */
 
+/* Numero de vertices do grafo */
 int numNodes;
+/* Lista ligada que guarda as edges todas do grafo */
 static Link *head;
+
+/* Lista que guarda as informações de cada um dos vertices */
 Node *vertexInfo;
+
 int visited = 0;
 Stack nodeStack = NULL;
-int conjuntos = 0;
 int scc = 0;
-std::list< std::list<int> > sccBundle;
-std::list<int> sccSubNet;
-Link *sccHead;
+// std::list< std::list<int> > sccBundle;
+// std::list<int> sccSubNet;
 
+/*lista de edges entre diferentes scc*/
+std::list<sccEdge> sccEdges;
 
+/* vector que guarda os identificadores de cada scc, ou seja, o numero que o identifica em termos de vertice */
+/* Sempre que houver uma edge de um scc para outro, serao estes os identificadores apresentados*/
+std::vector<int> vertexSccId;
+
+/*                  */
 Link newNode(int value) {
     Link x = (Link) malloc(sizeof(struct graph));
     x->index = value;
@@ -144,6 +163,18 @@ bool compare_a(int first, int second ) {
     return first < second;
 }
 
+bool compareEdges(struct scc first, struct scc second) {
+    if(first.u == second.u) {
+        if(first.v < second.v) {
+            return true;
+        }
+    }
+    else if(first.u < second.u) {
+        return true;
+    }
+    return false;
+}
+
 void TarjanVisit(int vert) {
 
     vertexInfo[vert].discovery = visited;
@@ -151,15 +182,11 @@ void TarjanVisit(int vert) {
     visited++;
 
     push(&nodeStack, vert);
-    printf("Pushed %d to stack\n", vert);
-    printf("Stack top = %d\n", peek(nodeStack));
 
     Link x;
 
     for(x = head[vert]; x != NULL; x = x->next) {
         if (vertexInfo[x->index].discovery == -1) {
-            printf("am doing dfs\n\n");
-            // nodesVisited --;
             TarjanVisit(x->index);
             vertexInfo[vert].lowest = minimum(vertexInfo[vert].lowest, vertexInfo[x->index].lowest);
         }
@@ -170,67 +197,57 @@ void TarjanVisit(int vert) {
     }
 
     int popped = -1;
-
+    int scc_id = INT_MAX;
     /* this is the root of the SCC */
     if (vertexInfo[vert].discovery == vertexInfo[vert].lowest) {
-        /* retirar os elementos da stack */
-        /* até que vert == popped */
+        /* retirar os elementos da stack até que vert == popped */
         while (popped != vert) {
-            /*printf("popped before popping again: %d\n", popped);*/
             popped = pop(&nodeStack);
-            printf("popped element %d from stack.\n", popped);
+            if(popped < scc_id) {
+                scc_id = popped;
+            }
             vertexInfo[popped].scc = scc;
-            sccSubNet.push_front(popped);
-            printf("\nscc = %d\n", vertexInfo[popped].scc);
         }
+        vertexSccId.push_back(scc_id);
         scc++;
-        conjuntos++;
-        printf("acabou o conjunto\n");
-        sccSubNet.sort(compare_a);
-        sccBundle.push_front(sccSubNet);
-        sccSubNet.clear();
-        printf("\nNUMERO DE CONJUNTOS: %d\n", conjuntos);
     }
 }
 
 void TarjanSCC() {
-    printf("entrei no tarjanSCC\n");
     int k;
-    // printf("inicializei os valores de discovery\n");
 
     for(k = 0; k < numNodes; k++) {
-        // printf("entrei no segundo for em tarjanSCC()\n");
         if(vertexInfo[k].discovery == -1) {
-            printf("vou fazer o tarjan visit() do vertice %d\n", k);
             TarjanVisit(k);
         }
     }
 }
 
+void sccSearchEdges() {
 
-void sccEdges() {
-
-    int i, j, x, y;
-    for(i = 0; i < (int) sccBundle.size() - 2; i++) {
-        for(j = 0; j < (int) sccBundle[std::list <int>].size(); j++) {
-            int x = vertexInfo[j].scc;
-            Link ptr;
-            for(ptr = head[x]; ptr->next != NULL; ptr = ptr->next) {
-                y = vertexInfo[ptr->next->index].scc;
-                if(y != x) {
-                    sccHead[x] = insertEnd(sccHead[x], y);
-                }
+    int i;
+    int v;
+    for (i = 0; i < numNodes; i++) {
+        Link x;
+        sccEdge n;
+        v = vertexInfo[i].scc;
+        for (x = head[i]; x != NULL; x = x->next) {
+            int y = vertexInfo[x->index].scc;
+            if(v != y) {
+                n.u = vertexSccId[v];
+                n.v = vertexSccId[y];
+                sccEdges.push_back(n);
             }
         }
     }
+
+
 }
 
-void printList(Link head) {
-    link t;
-    for(t = head; t != NULL; t = t->next) {
-        printf("%d\n", t->index);
-    }
+bool repeated (sccEdge deleted, sccEdge notdeleted) {
+    return (deleted.u == notdeleted.u && deleted.v == notdeleted.v);
 }
+
 
 int main()  {
     /* Number of connections - arches*/
@@ -257,20 +274,9 @@ int main()  {
     }
 
     TarjanSCC();
-
-    sccHead = (Link *) malloc((sccBundle.size() - 1)* sizeof(Link));
-
-    for(i = 0; i < sccBundle.size() - 1; i++){
-        sccHead[i] = NULL;
-    }
-
-    sccEdges();
-
-    for(i = 0; i < sccBundle.size() - 1; i++){
-
-        printList(sccHead[i]);
-    }
-
+    sccSearchEdges();
+    sccEdges.sort(compareEdges);
+    sccEdges.unique(repeated);
 
     for(i = 0; i < numNodes; i++) {
         free(head[i]);
@@ -278,20 +284,11 @@ int main()  {
     free(head);
     free(vertexInfo);
 
-    printf("Lista de todos os SCC\n");
-    for ( std::list<int> inner_list : sccBundle ) {
-        printf("[");
-        for (int item : inner_list ) {
-            printf("%d ", item+1);
-            // std::cout << item << "], ";
-        }
-        printf("]");
-    }
-
-    printf("\n");
-
     /* RESPOSTAS DO PROJECTO */
-    std::cout << sccBundle.size() << "\n";
-
+    std::cout << scc << "\n";
+    std::cout << sccEdges.size() << "\n";
+    for (sccEdge list_edges : sccEdges ) {
+        printf("%d %d\n", list_edges.u + 1, list_edges.v + 1);
+    }
     return 0;
 }
