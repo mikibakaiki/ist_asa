@@ -5,18 +5,20 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <set>
 
-
+#define NOT_SEEN 0
+#define ON_STACK 1
+#define DONE -3
 
 
 /* To compile, run: */
-/*gcc -ansi -g -Wall proj.c -o test*/
+/*g++ -ansi -g -Wall proj.c -o test*/
 
 typedef struct node {
     int discovery;
     int lowest;
     int scc;
+    int entered;
 } Node;
 
 typedef struct scc {
@@ -39,26 +41,32 @@ typedef struct StackNode {
 
 /* Numero de vertices do grafo */
 int numNodes;
+
 /* Lista ligada que guarda as edges todas do grafo */
 static Link *head;
 
 /* Lista que guarda as informações de cada um dos vertices */
 Node *vertexInfo;
 
+/* Keeps track of discovery time */
 int visited = 0;
+
+/* Stack to keep vertex */
 Stack nodeStack = NULL;
+
+/* Number of SCC */
 int scc = 0;
-// std::list< std::list<int> > sccBundle;
-// std::list<int> sccSubNet;
 
 /*lista de edges entre diferentes scc*/
 std::list<sccEdge> sccEdges;
 
-/* vector que guarda os identificadores de cada scc, ou seja, o numero que o identifica em termos de vertice */
 /* Sempre que houver uma edge de um scc para outro, serao estes os identificadores apresentados*/
 std::vector<int> vertexSccId;
 
-/*                  */
+/*   END OF GLOBAL VARIABLES    */
+
+/*  GRAPH FUNCTIONS  */
+
 Link newNode(int value) {
     Link x = (Link) malloc(sizeof(struct graph));
     x->index = value;
@@ -68,37 +76,12 @@ Link newNode(int value) {
 
 Link insertEnd(Link nodeHead, int value) {
 
-    Link x;
-    if(nodeHead == NULL) {
-        return newNode(value);
-    }
-    for(x = nodeHead; x->next != NULL; x = x->next) {
-        if(x->index == value) {
-            return nodeHead;
-        }
-    }
-    x->next = newNode(value);
-    return nodeHead;
+    Link x = newNode(value);
+    x->next = nodeHead;
+    return x;
 }
 
-void removeNode(Link nodeHead, int headIndex) {
-    Link current, previous;
-    previous = NULL;
-
-    for (current = nodeHead; current != NULL; previous = current, current = current->next) {
-        if (vertexInfo[current->index].scc == vertexInfo[headIndex].scc) {  /* Found it. */
-            if (previous == NULL) {
-                /* Fix beginning pointer. */
-                nodeHead = current->next;
-            }
-            else {
-                previous->next = current->next;
-            }
-            free(current);
-            return;
-        }
-    }
-}
+/*   GRAPH FUNCTIONS END    */
 
 /* STACK ADT */
 
@@ -117,7 +100,6 @@ void push(Stack *root, int data) {
     Stack stackNode = newStackNode(data);
     stackNode->next = *root;
     *root = stackNode;
-    /*printf("%d pushed to stack\n", data);*/
 }
 
 int pop(Stack *root) {
@@ -138,22 +120,7 @@ int peek(Stack root) {
     return root->data;
 }
 
-int checkStack(Stack *root, int index) {
-    Stack temp = *root;
-
-    while(temp != NULL) {
-        if(temp->data == index) {
-            return 1;
-        }
-        else {
-            temp = temp->next;
-        }
-    }
-    return 0;
-}
-
 /* STACK ADT END */
-
 
 int minimum(int u, int v) {
     return u > v ? v : u;
@@ -182,17 +149,19 @@ void TarjanVisit(int vert) {
     visited++;
 
     push(&nodeStack, vert);
+    vertexInfo[vert].entered = ON_STACK;
 
     Link x;
-
+    int a;
     for(x = head[vert]; x != NULL; x = x->next) {
-        if (vertexInfo[x->index].discovery == -1) {
-            TarjanVisit(x->index);
-            vertexInfo[vert].lowest = minimum(vertexInfo[vert].lowest, vertexInfo[x->index].lowest);
+        a = x->index;
+        if (vertexInfo[a].discovery == -1) {
+            TarjanVisit(a);
+            vertexInfo[vert].lowest = minimum(vertexInfo[vert].lowest, vertexInfo[a].lowest);
         }
         /*ou se esse vertice estiver na stack*/
-        else if (checkStack(&nodeStack, x->index) == 1) {
-            vertexInfo[vert].lowest = minimum(vertexInfo[vert].lowest, vertexInfo[x->index].lowest);
+        else if(vertexInfo[a].entered == ON_STACK) {
+            vertexInfo[vert].lowest = minimum(vertexInfo[vert].lowest, vertexInfo[a].lowest);
         }
     }
 
@@ -203,10 +172,12 @@ void TarjanVisit(int vert) {
         /* retirar os elementos da stack até que vert == popped */
         while (popped != vert) {
             popped = pop(&nodeStack);
+
             if(popped < scc_id) {
                 scc_id = popped;
             }
             vertexInfo[popped].scc = scc;
+            vertexInfo[popped].entered = DONE;
         }
         vertexSccId.push_back(scc_id);
         scc++;
@@ -227,27 +198,43 @@ void sccSearchEdges() {
 
     int i;
     int v;
+    Link x;
+    sccEdge n;
     for (i = 0; i < numNodes; i++) {
-        Link x;
-        sccEdge n;
         v = vertexInfo[i].scc;
+        if (v == scc) {
+            break;
+        }
         for (x = head[i]; x != NULL; x = x->next) {
             int y = vertexInfo[x->index].scc;
             if(v != y) {
                 n.u = vertexSccId[v];
                 n.v = vertexSccId[y];
-                sccEdges.push_back(n);
+                sccEdges.push_front(n);
             }
         }
     }
-
-
 }
 
 bool repeated (sccEdge deleted, sccEdge notdeleted) {
     return (deleted.u == notdeleted.u && deleted.v == notdeleted.v);
 }
 
+void initStuff() {
+    int i;
+    for (i = 0; i < numNodes; i++) {
+        head[i] = NULL;
+        vertexInfo[i].discovery = -1;
+        vertexInfo[i].lowest = -1;
+        vertexInfo[i].scc = -1;
+        vertexInfo[i].entered = false;
+    }
+}
+
+void sortAndErase() {
+    sccEdges.sort(compareEdges);
+    sccEdges.unique(repeated);
+}
 
 int main()  {
     /* Number of connections - arches*/
@@ -258,14 +245,9 @@ int main()  {
     scanf("%d %d", &numNodes, &numConnections);
 
     head = (Link *) malloc(numNodes * sizeof(Link));
-
     vertexInfo = (Node *) malloc(numNodes * sizeof(Node));
 
-    for (i = 0; i < numNodes; i++) {
-        vertexInfo[i].discovery = -1;
-        vertexInfo[i].lowest = -1;
-        vertexInfo[i].scc = -1;
-    }
+    initStuff();
 
     for(i = 0; i < numConnections; i++) {
         int vertU, vertV;
@@ -275,13 +257,13 @@ int main()  {
 
     TarjanSCC();
     sccSearchEdges();
-    sccEdges.sort(compareEdges);
-    sccEdges.unique(repeated);
+    sortAndErase();
 
     for(i = 0; i < numNodes; i++) {
         free(head[i]);
     }
     free(head);
+    free(nodeStack);
     free(vertexInfo);
 
     /* RESPOSTAS DO PROJECTO */
