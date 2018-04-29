@@ -17,16 +17,6 @@ typedef struct edge {
 
 } Edge;
 
-// class Edge {
-// public:
-//     int u;
-//     int v;
-//     int cap;
-//     int flow;
-//
-//     Edge(){}
-// };
-
 typedef struct pixel {
     int id;
     int i;
@@ -34,16 +24,6 @@ typedef struct pixel {
     std::vector<Edge> edgeList;
 
 } Pixel;
-
-// class Pixel {
-// public:
-//     int id;
-//     int i;
-//     int j;
-//     std::list<Edge> edgeList;
-//
-//     Pixel(){}
-// };
 
 /*    VARIAVEIS GLOBAIS     */
 int numPixels;
@@ -67,8 +47,9 @@ void scanInput() {
     numPixels = numLinhas * numColunas;
     head = (Pixel *) malloc(sizeof(struct pixel) * (numPixels + 2));
     head[0].id = SOURCE;                // A primeira posicao de head e o vertice S - source
+    head[0].i = head[0].j = -1;
     head[numPixels + 1].id = SINK;      // A ultima posicao de head e o vertice T - sink
-
+    head[numPixels + 1].i = head[numPixels + 1].j = -2;
     scanf("\n");
 
     // scan for the first matrix - edges from source vertex S to all vertex x
@@ -112,31 +93,33 @@ void scanInput() {
 
     scanf("\n");
     auxCont = 1;
+    // horizontal edges, working
 
     for(i = 0; i < numLinhas; i++) {
         for(j = 0; j < numColunas - 1; j++) {
             scanf("%d", &vertexHor);
             Edge e;
             e.u = head[auxCont].id;
-            e.v = head[auxCont + 1].id;
-            e.cap = vertexHor;
-            head[auxCont].edgeList.push_back(e);
-
-            //adding to the vertex v, but swaping the u for v and vice versa
-            e.u = head[auxCont + 1].id;
+            auxCont++;
             e.v = head[auxCont].id;
             e.cap = vertexHor;
-            head[auxCont + 1].edgeList.push_back(e);
+            head[auxCont - 1].edgeList.push_back(e);
 
-            auxCont++;
+            //adding to the vertex v, but swaping the u for v and vice versa
+            e.u = head[auxCont].id;
+            e.v = head[auxCont - 1].id;
+            e.cap = vertexHor;
+            head[auxCont].edgeList.push_back(e);
             scanf(" ");
         }
         scanf("\n");
+        auxCont++;
     }
 
     scanf("\n");
     auxCont = 1;
 
+    // vertical edges, works!
     for(i = 0; i < numLinhas - 1; i++) {
         for(j = 0; j < numColunas; j++) {
             scanf("%d", &vertexVer);
@@ -156,7 +139,6 @@ void scanInput() {
         }
         scanf("\n");
     }
-//TODO A ligacao nao pode ser so para o actual + 1 (nas horizontais)!!!
 }
 
 
