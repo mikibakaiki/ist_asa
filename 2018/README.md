@@ -42,9 +42,9 @@ We had to decide which infrastructure a city should build - road or airport - in
 | :-------------: |:-------------:|
 | `gdb ./<file_to_execute_>`      | run gdb with the program you want to test |
 | `(gdb)b line_number`      | insert a `b`reak in given `line_number`     |
-| `r < path/to/some/testfile.txt` | `r`un the program with `testfile.txt`'s input     |
-| `n` | `n`ext command to execute on program     |
-| `p some_variable` | `p`rint `some_variable`'s value    |
+| `(gdb)r < path/to/some/testfile.txt` | `r`un the program with `testfile.txt`'s input     |
+| `(gdb)n` | `n`ext command to execute on program     |
+| `(gdb)p some_variable` | `p`rint `some_variable`'s value    |
 |`Ctrl + x + a`|enter TUI mode :)|
 
 
