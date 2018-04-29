@@ -141,9 +141,6 @@ void scanInput() {
     }
 }
 
-
-
-
 int main() {
 
     scanInput();
