@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 #define SOURCE -1
 #define SINK -2
@@ -31,58 +32,12 @@ typedef struct pixel {
 
 } Pixel;
 
-/*A structure to represent a stack*/
-typedef struct StackNode {
-    int data;
-    struct StackNode* next;
-} *Stack;
-
 
 /*    VARIAVEIS GLOBAIS     */
 int numPixels;
 Pixel *head;
 int maxFlow;
-/* Stack to keep vertex */
-Stack pixelStack = NULL;
-
-/* STACK ADT */
-
-Stack newStackNode(int data) {
-    Stack pixelStack = (Stack) malloc(sizeof(struct StackNode));
-    pixelStack->data = data;
-    pixelStack->next = NULL;
-    return pixelStack;
-}
-
-int isEmpty(Stack root) {
-    return !root;
-}
-
-void push(Stack *root, int data) {
-    Stack stackNode = newStackNode(data);
-    stackNode->next = *root;
-    *root = stackNode;
-}
-
-int pop(Stack *root) {
-    if (isEmpty(*root)) {
-        return -1;
-    }
-    Stack temp = *root;
-    *root = (*root)->next;
-    int popped = temp->data;
-    free(temp);
-
-    return popped;
-}
-
-int peek(Stack root) {
-    if (isEmpty(root))
-    return INT_MIN;
-    return root->data;
-}
-
-/* STACK ADT END */
+std::vector<int> parentPixel;
 
 void scanInput() {
 
@@ -99,10 +54,17 @@ void scanInput() {
 
     numPixels = numLinhas * numColunas;
     head = (Pixel *) malloc(sizeof(struct pixel) * (numPixels + 2));
-    head[0].id = SOURCE;                // A primeira posicao de head e o vertice S - source
+
+    head[0].id = SOURCE;         // A primeira posicao de head e o vertice S - source
     head[0].i = head[0].j = -1;
-    head[numPixels + 1].id = SINK;      // A ultima posicao de head e o vertice T - sink
+
+    head[numPixels + 1].id = SINK;  // A ultima posicao de head e o vertice T - sink
     head[numPixels + 1].i = head[numPixels + 1].j = -2;
+
+    for (i = 0; i < numPixels + 2; ++i) {
+        parentPixel.push_back(NULL);
+    }
+
     scanf("\n");
 
     // scan for the first matrix - edges from source vertex S to all vertex x
@@ -196,28 +158,71 @@ void scanInput() {
 
 /* tenho que passar os id's + 1 de cada vertice */
 
-void BFS(int vertex) {
-    push(&pixelStack, vertex);
-    while(isEmpty != NULL) {
-        int v = pop(&pixelStack);
-        if(head[v].visited == FALSE) {
-            head[v].visited = TRUE;
-            for(Edge e : head[v].edgeList) {
-                if(head[e.v + 1].visited == FALSE) {
-                    push(&pixelStack, e.v + 1);
+int BFS(int start, int end) {
+
+    std::vector<int> currentPathCapacity (numPixels + 2);
+    std::fill(currentPathCapacity.begin(), currentPathCapacity.end(), -1);
+
+    queue<int> q;
+    q.push(start);
+    parentPixel[start] = -1;
+
+    while(q.empty() == false) {
+        int currentPixel = q.front();
+        q.pop();
+
+        for(Edge e : head[currentPixel].edgeList) {
+            if(parentPixel[e.v + 1] == NULL && e.cap - e.flow > 0) {
+                parentPixel[e.v + 1] = currentPixel;
+                currentPathCapacity[e.v + 1] = min(currentPathCapacity[currentPixel], (e.cap - e.flow));
+
+                if(e.v + 1 == end) {
+                    // e.cap = e.cap - currentPathCapacity[end];
+
+                    return currentPathCapacity[end];
                 }
+
+                q.push(e.v + 1);
             }
         }
     }
+    return 0;
 }
 
 
+int EdmondsKarp(int start, int end) {
+    int flow = 0;
+    while(true) {
+        int aux_flow = BFS(start, end);
+
+        if(aux_flow == 0) {
+            break;
+        }
+
+        flow += aux_flow;
+
+        int currentPixel = end;
+
+        while(currentPixel != start) {
+            int previousPixel = parentPixel[currentPixel];
+            for(Edge e : head[previousPixel].edgeList) {
+                if(e.v = currentPixel) {
+                    e.cap = e.cap - aux_flow;
+                }
+            }
+            currentPixel = previousPixel;
+        }
+    }
+
+    return flow;
+}
 
 
 int main() {
     maxFlow = 0;
 
     scanInput();
+    std::vector<int> parentPixel
 
     printf("Hello Worold\n");
     return 0;
