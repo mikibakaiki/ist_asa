@@ -8,6 +8,8 @@
 
 #define SOURCE -1
 #define SINK -2
+#define TRUE -5
+#define FALSE -6
 
 typedef struct edge {
     int u;
@@ -19,17 +21,65 @@ typedef struct edge {
 
 typedef struct pixel {
     int id;
+    int visited;
     int i;
     int j;
     std::vector<Edge> edgeList;
 
 } Pixel;
 
+/*A structure to represent a stack*/
+typedef struct StackNode {
+    int data;
+    struct StackNode* next;
+} *Stack;
+
+
 /*    VARIAVEIS GLOBAIS     */
 int numPixels;
 Pixel *head;
+int maxFlow;
+/* Stack to keep vertex */
+Stack pixelStack = NULL;
 
+/* STACK ADT */
 
+Stack newStackNode(int data) {
+    Stack stackNode = (Stack) malloc(sizeof(struct StackNode));
+    stackNode->data = data;
+    stackNode->next = NULL;
+    return stackNode;
+}
+
+int isEmpty(Stack root) {
+    return !root;
+}
+
+void push(Stack *root, int data) {
+    Stack stackNode = newStackNode(data);
+    stackNode->next = *root;
+    *root = stackNode;
+}
+
+int pop(Stack *root) {
+    if (isEmpty(*root)) {
+        return -1;
+    }
+    Stack temp = *root;
+    *root = (*root)->next;
+    int popped = temp->data;
+    free(temp);
+
+    return popped;
+}
+
+int peek(Stack root) {
+    if (isEmpty(root))
+    return INT_MIN;
+    return root->data;
+}
+
+/* STACK ADT END */
 
 void scanInput() {
 
@@ -141,7 +191,28 @@ void scanInput() {
     }
 }
 
+/* tenho que passar os id's + 1 de cada vertice */
+
+void BFS(int vertex) {
+    push(&pixelStack, vertex);
+    while(isEmpty != NULL) {
+        int v = pop(&pixelStack);
+        if(head[v].visited == FALSE) {
+            head[v].visited = TRUE;
+            for(Edge e : head[v].edgeList) {
+                if(head[e.v + 1].visited == FALSE) {
+                    push(&pixelStack, e.v + 1);
+                }
+            }
+        }
+    }
+}
+
+
+
+
 int main() {
+    maxFlow = 0;
 
     scanInput();
 
