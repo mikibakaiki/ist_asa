@@ -11,6 +11,9 @@
 #define TRUE -5
 #define FALSE -6
 
+
+/* Para compilar : g++ -ansi -g -std=c++11 -Wall p2.cpp -o test */
+
 typedef struct edge {
     int u;
     int v;
@@ -45,10 +48,10 @@ Stack pixelStack = NULL;
 /* STACK ADT */
 
 Stack newStackNode(int data) {
-    Stack stackNode = (Stack) malloc(sizeof(struct StackNode));
-    stackNode->data = data;
-    stackNode->next = NULL;
-    return stackNode;
+    Stack pixelStack = (Stack) malloc(sizeof(struct StackNode));
+    pixelStack->data = data;
+    pixelStack->next = NULL;
+    return pixelStack;
 }
 
 int isEmpty(Stack root) {
