@@ -165,21 +165,16 @@ void scanInput() {
 }
 
 
-void deleteFull() {
-    int i, j = 0;
-    // int u, v = 0;
-    for(j = 0; j < numPixels + 2; j++) {
-        for(i = 0; i < (int) head[j].edgeList.size(); i++) {
-            Edge e = head[j].edgeList[i];
-            if(e.cap == 0) {
-                // u = e.u;
-                // v = e.v;
-
-                head[j].edgeList.erase(head[j].edgeList.begin() + i);
-            }
-        }
-    }
-}
+// void deleteFull() {
+//     int i, j = 0;
+//     for(j = 0; j < numPixels + 2; j++) {
+//         for(i = 0; i < (int) head[j].edgeList.size(); i++) {
+//             if(head[j].edgeList[i].cap == 0) {
+//                 head[j].edgeList.erase(head[j].edgeList.begin() + i);
+//             }
+//         }
+//     }
+// }
 
 void decreaseCap(int u, int currentPixel, int flow) {
     int i;
@@ -200,7 +195,7 @@ void decreaseCap(int u, int currentPixel, int flow) {
 /* ou seja, a posicao no vector head[]*/
 int BFS(int start, int end) {
     // deleteFull();
-
+    // deleteEdges();
     currentPathCapacity.clear();
     parentPixel.clear();
 
