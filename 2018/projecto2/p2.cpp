@@ -38,6 +38,7 @@ int numPixels;
 Pixel *head;
 int maxFlow;
 std::vector<int> parentPixel;
+std::vector<int> currentPathCapacity;
 
 void scanInput() {
 
@@ -62,7 +63,8 @@ void scanInput() {
     head[numPixels + 1].i = head[numPixels + 1].j = -2;
 
     for (i = 0; i < numPixels + 2; ++i) {
-        parentPixel.push_back(NULL);
+        parentPixel.push_back(-2);
+        currentPathCapacity.push_back(0);
     }
 
     scanf("\n");
@@ -78,7 +80,13 @@ void scanInput() {
             e.u = SOURCE;
             e.v = head[auxCont].id;
             e.cap = sourceCap;
+            head[0].edgeList.push_back(e);
+
+            e.u = head[auxCont].id;
+            e.v = SOURCE;
+            e.cap = sourceCap;          //TODO aqui talvez seja 0, porque e residual edge
             head[auxCont].edgeList.push_back(e);
+
             auxCont++;
             scanf(" ");
         }
@@ -94,9 +102,14 @@ void scanInput() {
         for(j = 0; j < numColunas; j++) {
             scanf("%d", &toSinkCap);
             Edge e;
-            e.u = head[auxCont].id;
-            e.v = SINK;
+            e.u = numPixels;
+            e.v = head[auxCont].id;
             e.cap = toSinkCap;
+            head[numPixels + 1].edgeList.push_back(e);
+
+            e.u = head[auxCont].id;
+            e.v = numPixels;
+            e.cap = toSinkCap;              //TODO aqui talvez seja 0, porque e residual edge
             head[auxCont].edgeList.push_back(e);
 
 
@@ -157,28 +170,42 @@ void scanInput() {
 }
 
 /* tenho que passar os id's + 1 de cada vertice */
+/* ou seja, a posicao no vector head[]*/
+
+void deleteFull() {
+    int i, j = 0;
+    for(j = 0; j < numPixels + 2; j++) {
+        for(i = 0; i < (int) head[j].edgeList.size(); i++) {
+            Edge e = head[j].edgeList[i];
+            if(e.cap == 0) {
+                int u = e.u;
+                int v = e.v;
+
+                head[j].edgeList.erase(head[j].edgeList.begin() + i);
+                head[v + 1].edgeList.erase(head[v + 1].edgeList.begin())
+            }
+        }
+    }
+}
+
 
 int BFS(int start, int end) {
 
-    std::vector<int> currentPathCapacity (numPixels + 2);
-    std::fill(currentPathCapacity.begin(), currentPathCapacity.end(), -1);
-
-    queue<int> q;
+    std::queue<int> q;
     q.push(start);
     parentPixel[start] = -1;
+    currentPathCapacity[start] = INT_MAX;
 
-    while(q.empty() == false) {
+    while(!q.empty()) {
         int currentPixel = q.front();
         q.pop();
 
         for(Edge e : head[currentPixel].edgeList) {
-            if(parentPixel[e.v + 1] == NULL && e.cap - e.flow > 0) {
+            if(parentPixel[e.v + 1] == -2 && e.cap > 0) {
                 parentPixel[e.v + 1] = currentPixel;
-                currentPathCapacity[e.v + 1] = min(currentPathCapacity[currentPixel], (e.cap - e.flow));
+                currentPathCapacity[e.v + 1] = std::min(currentPathCapacity[currentPixel], (e.cap));
 
                 if(e.v + 1 == end) {
-                    // e.cap = e.cap - currentPathCapacity[end];
-
                     return currentPathCapacity[end];
                 }
 
@@ -206,12 +233,18 @@ int EdmondsKarp(int start, int end) {
         while(currentPixel != start) {
             int previousPixel = parentPixel[currentPixel];
             for(Edge e : head[previousPixel].edgeList) {
-                if(e.v = currentPixel) {
-                    e.cap = e.cap - aux_flow;
+                if(e.v == currentPixel - 1 && e.cap > 0) {
+                    // e.flow += aux_flow;
+                    e.cap -= aux_flow;
+                    // head[e.v + 1].edgeList
                 }
+                // if(e.v == previousPixel - 1 && e.cap > 0) {
+                //     e.cap -= aux_flow;
+                // }
             }
             currentPixel = previousPixel;
         }
+        deleteFull();
     }
 
     return flow;
@@ -222,9 +255,10 @@ int main() {
     maxFlow = 0;
 
     scanInput();
-    std::vector<int> parentPixel
-
+    maxFlow = EdmondsKarp(0, numPixels + 1);
     printf("Hello Worold\n");
+
+    printf("MAX FLUX : %d\n", maxFlow);
     return 0;
 
 }
