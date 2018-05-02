@@ -9,8 +9,8 @@
 
 #define SOURCE -1
 #define SINK -2
-#define TRUE -5
-#define FALSE -6
+#define PLANO -5
+#define CENARIO -6
 
 
 /* Para compilar : g++ -ansi -g -std=c++11 -Wall p2.cpp -o test */
@@ -39,11 +39,12 @@ Pixel *head;
 int maxFlow;
 std::vector<int> parentPixel;
 std::vector<int> currentPathCapacity;
+int numLinhas;
+int numColunas;
+
 
 void scanInput() {
 
-    int numLinhas;
-    int numColunas;
     int i, j;
     int auxCont = 1;
     int sourceCap;
@@ -85,10 +86,7 @@ void scanInput() {
             auxCont++;
             scanf(" ");
         }
-        scanf("\n");
     }
-
-    scanf("\n");
 
     auxCont = 1;
 
@@ -111,10 +109,8 @@ void scanInput() {
             auxCont++;
             scanf(" ");
         }
-        scanf("\n");
     }
 
-    scanf("\n");
     auxCont = 1;
     // horizontal edges, working
 
@@ -139,7 +135,6 @@ void scanInput() {
         auxCont++;
     }
 
-    scanf("\n");
     auxCont = 1;
 
     // vertical edges, works!
@@ -160,21 +155,8 @@ void scanInput() {
             auxCont++;
             scanf(" ");
         }
-        scanf("\n");
     }
 }
-
-
-// void deleteFull() {
-//     int i, j = 0;
-//     for(j = 0; j < numPixels + 2; j++) {
-//         for(i = 0; i < (int) head[j].edgeList.size(); i++) {
-//             if(head[j].edgeList[i].cap == 0) {
-//                 head[j].edgeList.erase(head[j].edgeList.begin() + i);
-//             }
-//         }
-//     }
-// }
 
 void decreaseCap(int u, int currentPixel, int flow) {
     int i;
@@ -193,9 +175,7 @@ void decreaseCap(int u, int currentPixel, int flow) {
 
 /* tenho que passar os id's + 1 de cada vertice */
 /* ou seja, a posicao no vector head[]*/
-int BFS(int start, int end) {
-    // deleteFull();
-    // deleteEdges();
+int BFSKarp(int start, int end) {
     currentPathCapacity.clear();
     parentPixel.clear();
 
@@ -215,6 +195,9 @@ int BFS(int start, int end) {
         q.pop();
 
         for(Edge e : head[currentPixel].edgeList) {
+            if(e.cap == 0) {
+                continue;
+            }
             if(parentPixel[e.v + 1] == -2 && e.cap > 0) {
                 parentPixel[e.v + 1] = currentPixel;
                 currentPathCapacity[e.v + 1] = std::min(currentPathCapacity[currentPixel], (e.cap));
@@ -231,12 +214,10 @@ int BFS(int start, int end) {
 }
 
 
-
 int EdmondsKarp(int start, int end) {
     int flow = 0;
     while(true) {
-        int aux_flow = BFS(start, end);
-        // printf("head[%d].edgeList = %d -> %d | %d\n", 0, head[0].edgeList[0].u,  head[0].edgeList[0].v,  head[0].edgeList[0].cap);
+        int aux_flow = BFSKarp(start, end);
 
         if(aux_flow == 0) {
             break;
@@ -249,19 +230,8 @@ int EdmondsKarp(int start, int end) {
         while(currentPixel != start) {
             int previousPixel = parentPixel[currentPixel];
             decreaseCap(previousPixel, currentPixel, aux_flow);
-            // for(Edge e : head[previousPixel].edgeList) {
-            //     if(e.v == currentPixel - 1 && e.cap > 0) {
-            //         // e.flow += aux_flow;
-            //         e.cap -= aux_flow;
-            //         // head[e.v + 1].edgeList
-            //     }
-            //     // if(e.v == previousPixel - 1 && e.cap > 0) {
-            //     //     e.cap -= aux_flow;
-            //     // }
-            // }
             currentPixel = previousPixel;
         }
-        // deleteFull();
     }
 
     return flow;
@@ -270,12 +240,34 @@ int EdmondsKarp(int start, int end) {
 
 int main() {
     maxFlow = 0;
+    int i;
+    int j = 0;
 
     scanInput();
     maxFlow = EdmondsKarp(0, numPixels + 1);
-    printf("Hello Worold\n");
 
-    printf("MAX FLUX : %d\n", maxFlow);
+    printf("%d\n\n", maxFlow);
+    BFSKarp(0, numPixels + 1);
+
+    for(i = 1; i < (int) parentPixel.size() - 1; i++) {
+        j++;
+
+        if (j == numColunas + 1) {
+            printf("\n");
+            j = 0;
+            i--;
+        }
+        else if(parentPixel[i] == -2) {
+            printf("P ");
+        }
+        else if (parentPixel[i] != -2)  {
+            printf("C ");
+        }
+    }
+
+    printf("\n");
+    
+
     return 0;
 
 }
