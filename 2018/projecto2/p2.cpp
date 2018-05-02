@@ -51,7 +51,9 @@ void scanInput() {
     int vertexHor;
     int vertexVer;
 
-    scanf("%d %d", &numLinhas, &numColunas);
+    scanf("%d", &numLinhas);
+
+    scanf("%d", &numColunas);
 
     numPixels = numLinhas * numColunas;
     head = (Pixel *) malloc(sizeof(struct pixel) * (numPixels + 2));
@@ -217,7 +219,7 @@ int BFSKarp(int start, int end) {
             if(e.cap == 0) {
                 continue;
             }
-            if(parentPixel[e.v + 1] == -2 && e.cap > 0) {
+            else if(parentPixel[e.v + 1] == -2 && e.cap > 0) {
                 parentPixel[e.v + 1] = currentPixel;
                 currentPathCapacity[e.v + 1] = std::min(currentPathCapacity[currentPixel], (e.cap));
 
@@ -276,9 +278,11 @@ int main() {
             j = 0;
             i--;
         }
+
         else if(parentPixel[i] == -2) {
             printf("P ");
         }
+
         else if (parentPixel[i] != -2)  {
             printf("C ");
         }
