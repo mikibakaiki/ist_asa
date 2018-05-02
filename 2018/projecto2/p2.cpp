@@ -62,11 +62,6 @@ void scanInput() {
     head[numPixels + 1].id = SINK;  // A ultima posicao de head e o vertice T - sink
     head[numPixels + 1].i = head[numPixels + 1].j = -2;
 
-    for (i = 0; i < numPixels + 2; ++i) {
-        parentPixel.push_back(-2);
-        currentPathCapacity.push_back(0);
-    }
-
     scanf("\n");
 
     // scan for the first matrix - edges from source vertex S to all vertex x
@@ -169,27 +164,51 @@ void scanInput() {
     }
 }
 
-/* tenho que passar os id's + 1 de cada vertice */
-/* ou seja, a posicao no vector head[]*/
 
 void deleteFull() {
     int i, j = 0;
+    // int u, v = 0;
     for(j = 0; j < numPixels + 2; j++) {
         for(i = 0; i < (int) head[j].edgeList.size(); i++) {
             Edge e = head[j].edgeList[i];
             if(e.cap == 0) {
-                int u = e.u;
-                int v = e.v;
+                // u = e.u;
+                // v = e.v;
 
                 head[j].edgeList.erase(head[j].edgeList.begin() + i);
-                head[v + 1].edgeList.erase(head[v + 1].edgeList.begin())
             }
         }
     }
 }
 
+void decreaseCap(int u, int currentPixel, int flow) {
+    int i;
+    for(i = 0; i < (int) head[u].edgeList.size(); i++) {
+        if(head[u].edgeList[i].v == currentPixel - 1 && head[u].edgeList[i].cap > 0) {
+            head[u].edgeList[i].cap -= flow;
+        }
+    }
+    for(i = 0; i < (int) head[currentPixel].edgeList.size(); i++) {
+        if(head[currentPixel].edgeList[i].v == u - 1 && head[currentPixel].edgeList[i].cap > 0) {
 
+            head[currentPixel].edgeList[i].cap -= flow;
+        }
+    }
+}
+
+/* tenho que passar os id's + 1 de cada vertice */
+/* ou seja, a posicao no vector head[]*/
 int BFS(int start, int end) {
+    // deleteFull();
+
+    currentPathCapacity.clear();
+    parentPixel.clear();
+
+    int i;
+    for (i = 0; i < numPixels + 2; ++i) {
+        parentPixel.push_back(-2);
+        currentPathCapacity.push_back(0);
+    }
 
     std::queue<int> q;
     q.push(start);
@@ -217,10 +236,12 @@ int BFS(int start, int end) {
 }
 
 
+
 int EdmondsKarp(int start, int end) {
     int flow = 0;
     while(true) {
         int aux_flow = BFS(start, end);
+        // printf("head[%d].edgeList = %d -> %d | %d\n", 0, head[0].edgeList[0].u,  head[0].edgeList[0].v,  head[0].edgeList[0].cap);
 
         if(aux_flow == 0) {
             break;
@@ -232,19 +253,20 @@ int EdmondsKarp(int start, int end) {
 
         while(currentPixel != start) {
             int previousPixel = parentPixel[currentPixel];
-            for(Edge e : head[previousPixel].edgeList) {
-                if(e.v == currentPixel - 1 && e.cap > 0) {
-                    // e.flow += aux_flow;
-                    e.cap -= aux_flow;
-                    // head[e.v + 1].edgeList
-                }
-                // if(e.v == previousPixel - 1 && e.cap > 0) {
-                //     e.cap -= aux_flow;
-                // }
-            }
+            decreaseCap(previousPixel, currentPixel, aux_flow);
+            // for(Edge e : head[previousPixel].edgeList) {
+            //     if(e.v == currentPixel - 1 && e.cap > 0) {
+            //         // e.flow += aux_flow;
+            //         e.cap -= aux_flow;
+            //         // head[e.v + 1].edgeList
+            //     }
+            //     // if(e.v == previousPixel - 1 && e.cap > 0) {
+            //     //     e.cap -= aux_flow;
+            //     // }
+            // }
             currentPixel = previousPixel;
         }
-        deleteFull();
+        // deleteFull();
     }
 
     return flow;
