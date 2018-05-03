@@ -19,7 +19,6 @@ typedef struct edge {
     int u;
     int v;
     int cap;
-    int flow;
 
 } Edge;
 
@@ -56,18 +55,20 @@ void scanInput() {
     scanf("%d", &numColunas);
 
     numPixels = numLinhas * numColunas;
-    head = (Pixel *) malloc(sizeof(struct pixel) * (numPixels + 2));
+    // head = (Pixel *) malloc(sizeof(struct pixel) * (numPixels + 2));
+
+    head = new struct pixel[numPixels + 2];
 
     head[0].id = SOURCE;         // A primeira posicao de head e o vertice S - source
 
     head[numPixels + 1].id = SINK;  // A ultima posicao de head e o vertice T - sink
-    
+
 
     // scan for the first matrix - edges from source vertex S to all vertex x
     for(i = 0; i < numLinhas; i++) {
-        
+
         for(j = 0; j < numColunas; j++) {
-            
+
             scanf("%d", &sourceCap);
             head[auxCont].id = auxCont - 1;
             head[auxCont].plano = sourceCap;
@@ -78,16 +79,16 @@ void scanInput() {
     auxCont = 1;
 
     // scan for the second matrix - edges from all vertex x to sink vertex T
-   
+
     for(i = 0; i < numLinhas; i++) {
         for(j = 0; j < numColunas; j++) {
-            
+
             scanf("%d", &toSinkCap);
             head[auxCont].cenario = toSinkCap;
             auxCont++;
         }
     }
-            
+
     for(i = 1; i < numPixels + 1; i++) {
         if(head[i].plano != 0 && head[i].cenario != 0) {
             if(head[i].plano < head[i].cenario) {
@@ -101,7 +102,7 @@ void scanInput() {
                 head[i].cenario = 0;
             }
         }
-        
+
         if(head[i].plano != 0) {
             Edge e;
 
@@ -126,7 +127,7 @@ void scanInput() {
 
             e.u = head[i].id;
             e.v = numPixels;
-            e.cap = head[i].cenario;             
+            e.cap = head[i].cenario;
             head[i].edgeList.push_back(e);
         }
     }
@@ -150,9 +151,7 @@ void scanInput() {
             e.v = head[auxCont - 1].id;
             e.cap = vertexHor;
             head[auxCont].edgeList.push_back(e);
-            scanf(" ");
         }
-        scanf("\n");
         auxCont++;
     }
 
@@ -174,7 +173,6 @@ void scanInput() {
             e.cap = vertexVer;
             head[auxCont + numColunas].edgeList.push_back(e);
             auxCont++;
-            scanf(" ");
         }
     }
 }
@@ -189,7 +187,7 @@ void decreaseCap(int u, int currentPixel, int flow) {
     for(i = 0; i < (int) head[currentPixel].edgeList.size(); i++) {
         if(head[currentPixel].edgeList[i].v == u - 1 && head[currentPixel].edgeList[i].cap > 0) {
 
-            head[currentPixel].edgeList[i].cap -= flow;
+            head[currentPixel].edgeList[i].cap += flow;
         }
     }
 }
@@ -203,7 +201,7 @@ int BFSKarp(int start, int end) {
     int i;
     for (i = 0; i < numPixels + 2; ++i) {
         parentPixel.push_back(-2);
-        currentPathCapacity.push_back(0);
+        currentPathCapacity.push_back(INT_MAX);
     }
 
     std::queue<int> q;
@@ -237,6 +235,7 @@ int BFSKarp(int start, int end) {
 
 int EdmondsKarp(int start, int end) {
     int flow = 0;
+
     while(true) {
         int aux_flow = BFSKarp(start, end);
 
@@ -271,25 +270,17 @@ int main() {
     BFSKarp(0, numPixels + 1);
 
     for(i = 1; i < (int) parentPixel.size() - 1; i++) {
-        j++;
+        if(parentPixel[i] == -2)
+            printf("P ");
+        else
+            printf("C ");
 
-        if (j == numColunas + 1) {
+        j++;
+        if (j == numColunas) {
             printf("\n");
             j = 0;
-            i--;
-        }
-
-        else if(parentPixel[i] == -2) {
-            printf("P ");
-        }
-
-        else if (parentPixel[i] != -2)  {
-            printf("C ");
         }
     }
-
-    printf("\n");
-    
 
     return 0;
 
