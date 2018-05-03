@@ -22,17 +22,14 @@ I used [Tarjan's Algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_co
 
 ### 2nd Project ###
 
-This project is about generating a [Minimum Spanning Tree](https://en.wikipedia.org/wiki/Minimum_spanning_tree). We used [Kruskal's Algorithm](https://en.wikipedia.org/wiki/Kruskal%27s_algorithm).
-
-We had to decide which infrastructure a city should build - road or airport - in order to have all citys connected, with the minimum cost possible. If a city has an airport, it is connected to all others cities that also have airports (we create an extra vertex that we can call the vertex "SKY" and is shared by every city that has an airport). Otherwise, the cities must be connected with roads. If building a road or an airport generates the same cost, roads are prioritized.
+This project was about image segmentation. Given a matrix of pixels, we had to decide which ones belonged to the background (_C_) and which ones were part of the plane of view (_P_). For this, 2 extra vertices were created, _S_ and _t_, indicating a _Source_ and a _sink_ (why is it t though?). So, it's a Max-flow-Min-cut problem, and we wanted to find the Maximum Flow of the network, using [Edmonds-Karp algorithm](https://en.wikipedia.org/wiki/Edmonds%E2%80%93Karp_algorithm). Given this [theorem](https://en.wikipedia.org/wiki/Max-flow_min-cut_theorem) when you find the Maximum Flow, you also have found out the Minimum Cut. And so, the vertices were categorized as _C_ if they were reachable from the Source (and thus belong to the set {_S_, _x_} where _x_ is the set of vertices reachable from _S_ on a _BFS_ - this set defines the Minimum Cut) and the others were labeled as _P_. 
 
 
 **Grades:**
 * Code test and execution: 16 / 16;
-* Code explanation, theorethical and practical analysis : 3.5 / 4;
-* Total: 19.5 / 20;
+* Code explanation, theorethical and practical analysis : ? / 4;
+* Total: ? / 20;
 
-[**Inspiration**](https://github.com/erkekin/Kruskal)
 
 
 
