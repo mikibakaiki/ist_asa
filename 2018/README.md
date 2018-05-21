@@ -22,13 +22,13 @@ I used [Tarjan's Algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_co
 
 ### 2nd Project ###
 
-This project was about image segmentation. Given a matrix of pixels, we had to decide which ones belonged to the background (_C_) and which ones were part of the plane of view (_P_). For this, 2 extra vertices were created, _S_ and _t_, indicating a _Source_ and a _sink_ (why is it t though?). So, it's a Max-flow-Min-cut problem, and we wanted to find the Maximum Flow of the network, using [Edmonds-Karp algorithm](https://en.wikipedia.org/wiki/Edmonds%E2%80%93Karp_algorithm). Given this [theorem](https://en.wikipedia.org/wiki/Max-flow_min-cut_theorem) when you find the Maximum Flow, you also have found out the Minimum Cut. And so, the vertices were categorized as _C_ if they were reachable from the Source (and thus belong to the set {_S_, _x_} where _x_ is the set of vertices reachable from _S_ on a _BFS_ - this set defines the Minimum Cut) and the others were labeled as _P_. 
+This project was about image segmentation. Given a matrix of pixels, we had to decide which ones belonged to the background (_C_) and which ones were part of the plane of view (_P_). For this, 2 extra vertices were created, _S_ and _t_, indicating a _Source_ and a _sink_ (why is it t though?). So, it's a Max-flow-Min-cut problem, and we wanted to find the Maximum Flow of the network, using [Edmonds-Karp algorithm](https://en.wikipedia.org/wiki/Edmonds%E2%80%93Karp_algorithm). Given this [theorem](https://en.wikipedia.org/wiki/Max-flow_min-cut_theorem) when you find the Maximum Flow, you also have found out the Minimum Cut. And so, the vertices were categorized as _C_ if they were reachable from the Source (and thus belong to the set {_S_, _x_} where _x_ is the set of vertices reachable from _S_ on a _BFS_ - this set defines the Minimum Cut) and the others were labeled as _P_.
 
 
 **Grades:**
 * Code test and execution: 16 / 16;
-* Code explanation, theorethical and practical analysis : ? / 4;
-* Total: ? / 20;
+* Code explanation, theorethical and practical analysis : 4 / 4;
+* Total: 20 / 20;
 
 
 
